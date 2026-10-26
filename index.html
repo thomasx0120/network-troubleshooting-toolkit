@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="เครื่องมือช่วยตรวจสอบและแก้ไขปัญหาเครือข่ายสำหรับเจ้าหน้าที่ IT Support">
+  <title>Network Troubleshooting Toolkit</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="brand-mark" aria-hidden="true">IT</div>
+      <div>
+        <h1>Network Troubleshooting Toolkit</h1>
+        <p>เครื่องมือช่วยตรวจสอบและแก้ไขปัญหาเครือข่าย สำหรับเจ้าหน้าที่ IT Support</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page-content">
+    <section class="section" aria-labelledby="commands-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">เครื่องมือคำสั่ง</p>
+          <h2 id="commands-heading">ศูนย์รวมคำสั่งเครือข่าย</h2>
+        </div>
+        <span class="section-badge">Windows</span>
+      </div>
+      <p class="section-intro">เลือกคัดลอกคำสั่ง แล้วเปิด Command Prompt หรือ PowerShell เพื่อเรียกใช้งาน</p>
+      <div class="command-grid">
+        <article class="card command-card">
+          <div class="card-topline"><span class="command-icon" aria-hidden="true">IP</span><span class="command-type">ข้อมูลเครือข่าย</span></div>
+          <h3>ตรวจสอบข้อมูล Network Adapter</h3>
+          <code class="command-code">ipconfig /all</code>
+          <p>ดู IP Address, Gateway, DNS และรายละเอียดของอะแดปเตอร์เครือข่ายทั้งหมด</p>
+          <button class="button button-primary copy-button" type="button" data-copy="ipconfig /all">คัดลอกคำสั่ง</button>
+        </article>
+        <article class="card command-card">
+          <div class="card-topline"><span class="command-icon" aria-hidden="true">GW</span><span class="command-type">ทดสอบการเชื่อมต่อ</span></div>
+          <h3>ทดสอบการเชื่อมต่อ Gateway</h3>
+          <code class="command-code">ping 192.168.1.1</code>
+          <p>ตรวจสอบว่าเครื่องติดต่อเราเตอร์หรือ Default Gateway ได้หรือไม่</p>
+          <button class="button button-primary copy-button" type="button" data-copy="ping 192.168.1.1">คัดลอกคำสั่ง</button>
+        </article>
+        <article class="card command-card">
+          <div class="card-topline"><span class="command-icon" aria-hidden="true">IP</span><span class="command-type">ทดสอบการเชื่อมต่อ</span></div>
+          <h3>ทดสอบการเชื่อมต่อ Public IP</h3>
+          <code class="command-code">ping 8.8.8.8</code>
+          <p>ทดสอบการเชื่อมต่ออินเทอร์เน็ตไปยัง Public IP ของ Google</p>
+          <button class="button button-primary copy-button" type="button" data-copy="ping 8.8.8.8">คัดลอกคำสั่ง</button>
+        </article>
+        <article class="card command-card">
+          <div class="card-topline"><span class="command-icon" aria-hidden="true">TR</span><span class="command-type">ตรวจสอบเส้นทาง</span></div>
+          <h3>ตรวจสอบเส้นทางเครือข่าย</h3>
+          <code class="command-code">tracert 8.8.8.8</code>
+          <p>แสดงเส้นทางและจุดต่าง ๆ ที่ข้อมูลเดินทางไปยังปลายทาง</p>
+          <button class="button button-primary copy-button" type="button" data-copy="tracert 8.8.8.8">คัดลอกคำสั่ง</button>
+        </article>
+        <article class="card command-card">
+          <div class="card-topline"><span class="command-icon" aria-hidden="true">DNS</span><span class="command-type">ตรวจสอบ DNS</span></div>
+          <h3>ตรวจสอบการแปลงชื่อโดเมน</h3>
+          <code class="command-code">nslookup google.com</code>
+          <p>ตรวจสอบว่า DNS แปลงชื่อโดเมนเป็น IP Address ได้หรือไม่</p>
+          <button class="button button-primary copy-button" type="button" data-copy="nslookup google.com">คัดลอกคำสั่ง</button>
+        </article>
+        <article class="card command-card">
+          <div class="card-topline"><span class="command-icon" aria-hidden="true">PC</span><span class="command-type">ข้อมูลคอมพิวเตอร์</span></div>
+          <h3>ตรวจสอบชื่อคอมพิวเตอร์</h3>
+          <code class="command-code">hostname</code>
+          <p>แสดงชื่อเครื่องคอมพิวเตอร์ที่กำลังใช้งาน</p>
+          <button class="button button-primary copy-button" type="button" data-copy="hostname">คัดลอกคำสั่ง</button>
+        </article>
+        <article class="card command-card">
+          <div class="card-topline"><span class="command-icon" aria-hidden="true">DNS</span><span class="command-type">แก้ไขปัญหา DNS</span></div>
+          <h3>ล้าง DNS Cache</h3>
+          <code class="command-code">ipconfig /flushdns</code>
+          <p>ล้างข้อมูล DNS ที่บันทึกไว้ชั่วคราว เพื่อแก้ปัญหาการค้นหาชื่อโดเมน</p>
+          <button class="button button-primary copy-button" type="button" data-copy="ipconfig /flushdns">คัดลอกคำสั่ง</button>
+        </article>
+      </div>
+      <p class="feedback" id="command-feedback" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="section" aria-labelledby="info-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">รายละเอียดอุปกรณ์</p>
+          <h2 id="info-heading">แบบฟอร์มข้อมูลเครือข่าย</h2>
+        </div>
+      </div>
+      <div class="card form-card">
+        <p class="section-intro">บันทึกข้อมูลเครื่องและคัดลอกเป็นข้อความเพื่อแนบในบันทึกการแก้ไขปัญหา</p>
+        <form id="network-info-form">
+          <div class="form-grid">
+            <label class="field">
+              <span>ชื่อคอมพิวเตอร์</span>
+              <input type="text" name="computerName" placeholder="เช่น DESKTOP-01" autocomplete="off">
+            </label>
+            <label class="field">
+              <span>IP Address</span>
+              <input type="text" name="ipAddress" placeholder="เช่น 192.168.1.25" inputmode="decimal">
+            </label>
+            <label class="field">
+              <span>Subnet Mask</span>
+              <input type="text" name="subnetMask" placeholder="เช่น 255.255.255.0" inputmode="decimal">
+            </label>
+            <label class="field">
+              <span>Default Gateway</span>
+              <input type="text" name="gateway" placeholder="เช่น 192.168.1.1" inputmode="decimal">
+            </label>
+            <label class="field">
+              <span>DNS Server</span>
+              <input type="text" name="dnsServer" placeholder="เช่น 8.8.8.8" inputmode="decimal">
+            </label>
+            <label class="field field-wide">
+              <span>บันทึกเพิ่มเติม</span>
+              <textarea name="notes" rows="3" placeholder="จดรายละเอียดที่เกี่ยวข้องกับอุปกรณ์นี้"></textarea>
+            </label>
+          </div>
+          <div class="button-row">
+            <button class="button button-primary" type="button" id="copy-info">คัดลอกข้อมูล</button>
+            <button class="button button-secondary" type="reset">ล้างแบบฟอร์ม</button>
+          </div>
+        </form>
+        <p class="feedback" id="info-feedback" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="checklist-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">ทำตามทีละขั้น</p>
+          <h2 id="checklist-heading">รายการตรวจสอบปัญหาเครือข่าย</h2>
+        </div>
+      </div>
+      <div class="card checklist-card">
+        <div class="progress-heading">
+          <span>ความคืบหน้า</span>
+          <span id="progress-count" class="progress-count">เสร็จแล้ว 0 จาก 6 ข้อ</span>
+        </div>
+        <div class="progress-track" id="progress-track" role="progressbar" aria-label="ความคืบหน้ารายการตรวจสอบ" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="checklist-items">
+          <label class="checklist-item"><input type="checkbox"><span>ตรวจสอบสาย LAN หรือการเชื่อมต่อ Wi-Fi</span></label>
+          <label class="checklist-item"><input type="checkbox"><span>เรียกใช้ <code>ipconfig /all</code></span></label>
+          <label class="checklist-item"><input type="checkbox"><span>Ping ไปยัง Default Gateway</span></label>
+          <label class="checklist-item"><input type="checkbox"><span>Ping ไปยัง <code>8.8.8.8</code></span></label>
+          <label class="checklist-item"><input type="checkbox"><span>เรียกใช้ <code>nslookup google.com</code></span></label>
+          <label class="checklist-item"><input type="checkbox"><span>ตรวจสอบว่าอุปกรณ์อื่นพบปัญหาเดียวกันหรือไม่</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="notes-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">บันทึกผลการตรวจสอบ</p>
+          <h2 id="notes-heading">บันทึกช่วยจำ</h2>
+        </div>
+      </div>
+      <div class="card notes-card">
+        <label class="field" for="quick-notes">
+          <span>บันทึกสิ่งที่ตรวจพบหรือแนวทางแก้ไข</span>
+          <textarea id="quick-notes" rows="6" placeholder="เช่น ทดสอบ Ping Gateway สำเร็จ แต่ไม่สามารถเปิดเว็บไซต์ได้..."></textarea>
+        </label>
+        <div class="button-row">
+          <button class="button button-primary" type="button" id="copy-notes">คัดลอกบันทึก</button>
+        </div>
+        <p class="feedback" id="notes-feedback" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">เครื่องมือนี้ช่วยจัดระเบียบการตรวจสอบเบื้องต้น ข้อมูลจะไม่ถูกส่งออกจากอุปกรณ์</div>
+  </footer>
+</body>
+</html>
