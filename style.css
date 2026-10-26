@@ -607,6 +607,111 @@ textarea:focus-visible {
   margin: 0;
 }
 
+.archive-card {
+  padding: 20px;
+}
+
+.archive-toolbar,
+.archive-actions,
+.saved-case,
+.saved-case-actions {
+  display: flex;
+  align-items: center;
+}
+
+.archive-toolbar {
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.archive-count {
+  color: #34445a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.archive-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.archive-actions .button,
+.saved-case-actions .button {
+  min-height: 36px;
+  padding: 7px 11px;
+  font-size: 11px;
+}
+
+.archive-actions .button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+}
+
+.archive-privacy {
+  margin: 10px 0 14px;
+  color: #77869a;
+  font-size: 10px;
+}
+
+.saved-case-list {
+  display: grid;
+  gap: 9px;
+}
+
+.saved-case {
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 14px;
+  border: 1px solid #e7edf4;
+  border-radius: 10px;
+  background: #fbfcfe;
+}
+
+.saved-case-details {
+  min-width: 0;
+}
+
+.saved-case-details h3 {
+  margin: 0 0 2px;
+  color: #26374d;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.saved-case-meta,
+.saved-case-progress {
+  margin: 0;
+  color: #718096;
+  font-size: 10px;
+}
+
+.saved-case-progress {
+  margin-top: 3px;
+  color: #48658b;
+}
+
+.saved-case-actions {
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.button-danger {
+  border-color: #f2d8d8;
+  background: #fff;
+  color: #a43e3e;
+}
+
+.button-danger:hover {
+  border-color: #e9bcbc;
+  background: #fff6f6;
+}
+
+.empty-state[hidden] {
+  display: none;
+}
+
 .section-heading {
   display: flex;
   align-items: flex-end;
@@ -1166,6 +1271,35 @@ textarea:focus-visible {
 
   .guide-card {
     padding: 15px;
+  }
+
+  .archive-card {
+    padding: 14px;
+  }
+
+  .archive-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .archive-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .saved-case {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+    padding: 11px;
+  }
+
+  .saved-case-actions {
+    width: 100%;
+  }
+
+  .saved-case-actions .button {
+    flex: 1;
   }
 
   .guide-divider {

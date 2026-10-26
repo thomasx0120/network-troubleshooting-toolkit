@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#10243e">
   <meta name="description" content="แดชบอร์ดช่วยตรวจสอบและแก้ไขปัญหาเครือข่ายสำหรับเจ้าหน้าที่ IT Support">
   <title>Network Troubleshooting Toolkit</title>
-  <link rel="stylesheet" href="style.css?v=2">
-  <script src="script.js?v=2" defer></script>
+  <link rel="stylesheet" href="style.css?v=3">
+  <script src="script.js?v=3" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">ข้ามไปยังเนื้อหาหลัก</a>
@@ -20,6 +20,7 @@
       </a>
       <nav class="top-nav" aria-label="เมนูหลัก">
         <a href="#guided-troubleshooter">ผู้ช่วยแก้ปัญหา</a>
+        <a href="#saved-cases">เคสที่บันทึก</a>
         <a href="#commands">คำสั่งเครือข่าย</a>
         <a href="#device-info">ข้อมูลอุปกรณ์</a>
         <a href="#checklist">รายการตรวจสอบ</a>
@@ -75,6 +76,10 @@
       <div class="card guide-card">
         <form id="guided-form">
           <div class="guide-context form-grid">
+            <label class="field">
+              <span>หัวข้อเคส / เลขที่งาน (ไม่บังคับ)</span>
+              <input type="text" name="caseTitle" maxlength="100" placeholder="เช่น INC-1024 หรือ Wi-Fi ห้องประชุม">
+            </label>
             <label class="field">
               <span>อาการที่พบ</span>
               <select name="symptom">
@@ -236,11 +241,36 @@
           <p class="recommendation-reason" id="recommendation-reason">ทำตามลำดับจากการตรวจเบื้องต้นไปสู่การทดสอบเครือข่ายและ DNS</p>
 
           <div class="guide-actions">
+            <button class="button button-primary" type="button" id="save-case">บันทึกเคสนี้</button>
             <button class="button button-primary" type="button" id="copy-guide-report">คัดลอกรายงานตรวจสอบ</button>
             <button class="button button-secondary" type="reset">เริ่มบันทึกปัญหาใหม่</button>
             <p class="feedback" id="guide-feedback" role="status" aria-live="polite"></p>
           </div>
         </form>
+      </div>
+    </section>
+
+    <section class="section" id="saved-cases" aria-labelledby="saved-cases-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">คลังประวัติการแก้ไข</p>
+          <h2 id="saved-cases-heading">เคสที่บันทึกไว้</h2>
+          <p class="section-intro">บันทึกแต่ละครั้งจะแยกเก็บเป็นเคส ไม่ทับข้อมูลเคสอื่น</p>
+        </div>
+      </div>
+      <div class="card archive-card">
+        <div class="archive-toolbar">
+          <span class="archive-count" id="saved-case-count">มีเคสที่บันทึก 0 รายการ</span>
+          <div class="archive-actions">
+            <button class="button button-secondary" type="button" id="import-cases">นำเข้าไฟล์ JSON</button>
+            <button class="button button-primary" type="button" id="export-cases" disabled>ดาวน์โหลดข้อมูลทั้งหมด</button>
+            <input class="visually-hidden" id="import-cases-file" type="file" accept="application/json,.json" tabindex="-1" hidden>
+          </div>
+        </div>
+        <p class="archive-privacy">ไฟล์ส่งออกอาจมี IP Address ชื่อเครื่อง และบันทึกภายใน ตรวจสอบข้อมูลก่อนส่งให้ผู้อื่น</p>
+        <div class="saved-case-list" id="saved-case-list"></div>
+        <p class="empty-state" id="empty-saved-cases">ยังไม่มีเคสที่บันทึก กรอกแบบฟอร์มด้านบนแล้วกด “บันทึกเคสนี้”</p>
+        <p class="feedback" id="archive-feedback" role="status" aria-live="polite"></p>
       </div>
     </section>
 
