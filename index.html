@@ -19,10 +19,11 @@
         <span class="brand-name">IT Support <span>TOOLKIT</span></span>
       </a>
       <nav class="top-nav" aria-label="เมนูหลัก">
+        <a href="#guided-troubleshooter">ผู้ช่วยแก้ปัญหา</a>
         <a href="#commands">คำสั่งเครือข่าย</a>
         <a href="#device-info">ข้อมูลอุปกรณ์</a>
         <a href="#checklist">รายการตรวจสอบ</a>
-        <a href="#quick-notes">บันทึกช่วยจำ</a>
+        <a href="#notes-section">บันทึกช่วยจำ</a>
       </nav>
       <span class="local-badge"><span aria-hidden="true"></span> ใช้งานส่วนตัว</span>
     </div>
@@ -34,7 +35,7 @@
         <p class="eyebrow eyebrow-light">NETWORK OPERATIONS · เครื่องมือสำหรับ Windows</p>
         <h1 id="welcome-title">Network Troubleshooting Toolkit</h1>
         <p>รวมเครื่องมือพื้นฐานไว้ที่เดียว ช่วยให้ตรวจสอบปัญหาเครือข่ายได้เป็นขั้นตอนและบันทึกผลได้สะดวก</p>
-        <a class="button button-light" href="#commands">เริ่มตรวจสอบ <span aria-hidden="true">↓</span></a>
+        <a class="button button-light" href="#guided-troubleshooter">เริ่มวิเคราะห์ปัญหา <span aria-hidden="true">↓</span></a>
       </div>
       <div class="welcome-art" aria-hidden="true">
         <div class="orbit orbit-one"></div>
@@ -59,6 +60,188 @@
         <span class="overview-icon icon-purple" aria-hidden="true">PC</span>
         <div><p>สถานะบันทึกข้อมูล</p><strong class="saved-state" id="saved-state">บันทึกในเครื่องนี้</strong></div>
       </article>
+    </section>
+
+    <section class="section" id="guided-troubleshooter" aria-labelledby="guide-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">ผู้ช่วยตรวจสอบทีละขั้น</p>
+          <h2 id="guide-heading">วิเคราะห์ปัญหาและบันทึกสิ่งที่ทำแล้ว</h2>
+          <p class="section-intro">เลือกอาการ ระบุผลแต่ละขั้น แล้วทำตามคำแนะนำจากต้นทางไปยังปลายทาง</p>
+        </div>
+        <span class="section-badge">บันทึกอัตโนมัติ</span>
+      </div>
+
+      <div class="card guide-card">
+        <form id="guided-form">
+          <div class="guide-context form-grid">
+            <label class="field">
+              <span>อาการที่พบ</span>
+              <select name="symptom">
+                <option value="no-internet">เชื่อมต่อเครือข่ายหรืออินเทอร์เน็ตไม่ได้</option>
+                <option value="slow">อินเทอร์เน็ตช้าหรือหลุดเป็นช่วง ๆ</option>
+                <option value="website">เปิดบางเว็บไซต์หรือบางระบบไม่ได้</option>
+                <option value="dns">เปิดเว็บไซต์ด้วยชื่อไม่ได้ แต่มี IP Address</option>
+                <option value="local">เข้าเครื่องพิมพ์หรืออุปกรณ์ในวง LAN ไม่ได้</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>ขอบเขตที่ได้รับผลกระทบ</span>
+              <select name="scope">
+                <option value="unknown">ยังไม่ทราบ — ต้องสอบถามหรือทดสอบก่อน</option>
+                <option value="one">พบเฉพาะเครื่องนี้</option>
+                <option value="many">พบหลายเครื่องหรือหลายคน</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="guide-divider">
+            <div>
+              <h3>บันทึกผลการตรวจแต่ละขั้น</h3>
+              <p>เรียงตามลำดับที่แนะนำ หากพบปัญหาให้แก้จุดนั้นก่อน แล้วจึงตรวจขั้นถัดไป</p>
+            </div>
+            <span id="guide-progress">ทำแล้ว 0 จาก 6 ขั้น</span>
+          </div>
+
+          <ol class="guide-steps">
+            <li class="guide-step" data-step-row="devices">
+              <span class="step-number">1</span>
+              <div class="step-content">
+                <h4>ตรวจว่ากระทบอุปกรณ์อื่นด้วยหรือไม่</h4>
+                <p>สอบถามผู้ใช้ใกล้เคียง หรือทดสอบอุปกรณ์อื่นบนเครือข่ายเดียวกัน เพื่อแยกปัญหาเครื่องเดียวกับปัญหาส่วนกลาง</p>
+                <label class="field step-result">
+                  <span>ผลการตรวจ</span>
+                  <select data-stage="devices">
+                    <option value="todo">ยังไม่ได้ตรวจ</option>
+                    <option value="pass">อุปกรณ์อื่นใช้งานได้ปกติ</option>
+                    <option value="issue">อุปกรณ์อื่นมีปัญหาเหมือนกัน</option>
+                  </select>
+                </label>
+                <label class="field step-note">
+                  <span>รายละเอียดที่พบ (ถ้ามี)</span>
+                  <input type="text" data-stage-note="devices" placeholder="เช่น พบ 3 เครื่องในแผนกเดียวกัน">
+                </label>
+              </div>
+            </li>
+            <li class="guide-step" data-step-row="link">
+              <span class="step-number">2</span>
+              <div class="step-content">
+                <h4>ตรวจสาย LAN หรือ Wi-Fi</h4>
+                <p>ดูสถานะ Wi-Fi / ไฟที่พอร์ต ตรวจสายให้แน่น หรือทดลองเชื่อมต่อเครือข่ายที่ถูกต้องก่อนใช้คำสั่ง</p>
+                <label class="field step-result">
+                  <span>ผลการตรวจ</span>
+                  <select data-stage="link">
+                    <option value="todo">ยังไม่ได้ตรวจ</option>
+                    <option value="pass">เชื่อมต่ออยู่และสถานะปกติ</option>
+                    <option value="issue">สายหลุด / Wi-Fi ไม่เชื่อมต่อ</option>
+                  </select>
+                </label>
+                <label class="field step-note">
+                  <span>รายละเอียดที่พบ (ถ้ามี)</span>
+                  <input type="text" data-stage-note="link" placeholder="เช่น Wi-Fi แสดง Connected">
+                </label>
+              </div>
+            </li>
+            <li class="guide-step" data-step-row="ip">
+              <span class="step-number">3</span>
+              <div class="step-content">
+                <h4>ตรวจ IP Address และ Gateway</h4>
+                <p>เรียก <code>ipconfig /all</code> แล้วดูว่า IPv4, Subnet Mask และ Default Gateway มีค่าถูกต้องหรือไม่</p>
+                <code class="step-command">ipconfig /all</code>
+                <label class="field step-result">
+                  <span>ผลการตรวจ</span>
+                  <select data-stage="ip">
+                    <option value="todo">ยังไม่ได้ตรวจ</option>
+                    <option value="pass">มี IP และ Gateway ถูกต้อง</option>
+                    <option value="issue">ไม่มี Gateway หรือ IP ขึ้นต้นด้วย 169.254</option>
+                  </select>
+                </label>
+                <label class="field step-note">
+                  <span>รายละเอียดที่พบ (ถ้ามี)</span>
+                  <input type="text" data-stage-note="ip" placeholder="เช่น IPv4 192.168.1.25 / Gateway 192.168.1.1">
+                </label>
+              </div>
+            </li>
+            <li class="guide-step" data-step-row="gateway">
+              <span class="step-number">4</span>
+              <div class="step-content">
+                <h4>ทดสอบการเชื่อมต่อ Gateway</h4>
+                <p>Ping ไปยัง Gateway ของเครื่อง หากยังไม่ทราบให้กรอกในส่วนข้อมูลอุปกรณ์ก่อน</p>
+                <code class="step-command" id="guide-gateway-command">ping 192.168.1.1</code>
+                <label class="field step-result">
+                  <span>ผลการตรวจ</span>
+                  <select data-stage="gateway">
+                    <option value="todo">ยังไม่ได้ทดสอบ</option>
+                    <option value="pass">ได้รับ Reply</option>
+                    <option value="issue">หมดเวลา / ไม่ได้รับ Reply</option>
+                  </select>
+                </label>
+                <label class="field step-note">
+                  <span>รายละเอียดที่พบ (ถ้ามี)</span>
+                  <input type="text" data-stage-note="gateway" placeholder="เช่น Reply ได้ 4 ครั้ง หรือ Request timed out">
+                </label>
+              </div>
+            </li>
+            <li class="guide-step" data-step-row="internet">
+              <span class="step-number">5</span>
+              <div class="step-content">
+                <h4>ทดสอบการเชื่อมต่ออินเทอร์เน็ต</h4>
+                <p>เมื่อ Gateway ตอบกลับแล้ว ให้ทดสอบ Public IP เพื่อแยกปัญหาเครือข่ายภายในกับทางออกอินเทอร์เน็ต</p>
+                <code class="step-command">ping 8.8.8.8</code>
+                <label class="field step-result">
+                  <span>ผลการตรวจ</span>
+                  <select data-stage="internet">
+                    <option value="todo">ยังไม่ได้ทดสอบ</option>
+                    <option value="pass">ได้รับ Reply</option>
+                    <option value="issue">หมดเวลา / ไม่ได้รับ Reply</option>
+                  </select>
+                </label>
+                <label class="field step-note">
+                  <span>รายละเอียดที่พบ (ถ้ามี)</span>
+                  <input type="text" data-stage-note="internet" placeholder="เช่น Ping สำเร็จ หรือ Request timed out">
+                </label>
+              </div>
+            </li>
+            <li class="guide-step" data-step-row="dns">
+              <span class="step-number">6</span>
+              <div class="step-content">
+                <h4>ตรวจการทำงานของ DNS</h4>
+                <p>หาก Public IP ตอบกลับ แต่เปิดเว็บด้วยชื่อไม่ได้ ให้ตรวจการแปลงชื่อโดเมน</p>
+                <code class="step-command">nslookup google.com</code>
+                <label class="field step-result">
+                  <span>ผลการตรวจ</span>
+                  <select data-stage="dns">
+                    <option value="todo">ยังไม่ได้ทดสอบ</option>
+                    <option value="pass">แสดงผล DNS และ IP Address</option>
+                    <option value="issue">หาโดเมนไม่พบ / DNS request timed out</option>
+                  </select>
+                </label>
+                <label class="field step-note">
+                  <span>รายละเอียดที่พบ (ถ้ามี)</span>
+                  <input type="text" data-stage-note="dns" placeholder="เช่น Server ตอบกลับ หรือ DNS request timed out">
+                </label>
+              </div>
+            </li>
+          </ol>
+
+          <div class="guide-recommendation" id="guide-recommendation" aria-live="polite">
+            <span class="recommendation-icon" aria-hidden="true">→</span>
+            <div>
+              <p class="eyebrow">ขั้นตอนถัดไปที่แนะนำ</p>
+              <h3 id="recommendation-title">เริ่มจากตรวจว่าอุปกรณ์อื่นได้รับผลกระทบด้วยหรือไม่</h3>
+              <p id="recommendation-body">ตรวจขอบเขตปัญหาก่อน จะช่วยรู้ว่าควรแก้เฉพาะเครื่องหรือแจ้งทีมดูแลเครือข่าย</p>
+            </div>
+            <span class="recommendation-priority" id="recommendation-priority">ขั้นที่ 1</span>
+          </div>
+          <p class="recommendation-reason" id="recommendation-reason">ทำตามลำดับจากการตรวจเบื้องต้นไปสู่การทดสอบเครือข่ายและ DNS</p>
+
+          <div class="guide-actions">
+            <button class="button button-primary" type="button" id="copy-guide-report">คัดลอกรายงานตรวจสอบ</button>
+            <button class="button button-secondary" type="reset">เริ่มบันทึกปัญหาใหม่</button>
+            <p class="feedback" id="guide-feedback" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </div>
     </section>
 
     <section class="section" id="commands" aria-labelledby="commands-heading">

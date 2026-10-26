@@ -386,6 +386,227 @@ textarea:focus-visible {
   scroll-margin-top: 92px;
 }
 
+.guide-card {
+  padding: 22px;
+}
+
+.guide-context {
+  padding-bottom: 21px;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.guide-context select,
+.step-result select {
+  min-height: 41px;
+  padding: 9px 34px 9px 11px;
+  border: 1px solid #d6dfeb;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+}
+
+.guide-divider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px 0 14px;
+}
+
+.guide-divider h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.guide-divider p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.guide-divider > span {
+  flex: 0 0 auto;
+  color: #60728b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.guide-steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-step {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #e8edf4;
+  border-radius: 11px;
+  background: #fff;
+  transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.guide-step.step-is-next {
+  border-color: #8db4f1;
+  background: #f6f9ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.07);
+}
+
+.guide-step.step-is-done .step-number {
+  border-color: #c7ead3;
+  background: #e9f8ee;
+  color: #1f7a43;
+}
+
+.step-number {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid #dce5f0;
+  border-radius: 9px;
+  background: #f4f7fb;
+  color: #5c6f88;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.step-content {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(170px, 0.7fr);
+  align-items: start;
+  gap: 8px 16px;
+  min-width: 0;
+}
+
+.step-content h4 {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #26374d;
+  font-size: 13px;
+}
+
+.step-content > p {
+  grid-column: 1 / -1;
+  margin: -6px 0 1px;
+  color: #6b788b;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.step-command {
+  grid-column: 1 / -1;
+  width: fit-content;
+  padding: 3px 7px;
+  border: 1px solid #e5eaf2;
+  border-radius: 6px;
+  background: #f7f9fc;
+  color: #0f3b78;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+}
+
+.step-result,
+.step-note {
+  gap: 4px;
+  font-size: 10px;
+}
+
+.step-result select,
+.step-note input {
+  width: 100%;
+  min-width: 0;
+  min-height: 37px;
+  font-size: 11px;
+}
+
+.step-note input {
+  padding: 8px 10px;
+  border: 1px solid #d6dfeb;
+  border-radius: 8px;
+}
+
+.step-note input::placeholder {
+  color: #9ba7b7;
+}
+
+.guide-recommendation {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 17px;
+  border: 1px solid #cfe0fa;
+  border-radius: 11px;
+  background: linear-gradient(115deg, #f0f6ff, #f8faff);
+}
+
+.recommendation-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 11px;
+  background: #dceaff;
+  color: #2358a8;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.guide-recommendation .eyebrow {
+  margin-bottom: 2px;
+  font-size: 9px;
+}
+
+.guide-recommendation h3 {
+  margin: 0 0 4px;
+  color: #17355c;
+  font-size: 14px;
+}
+
+.guide-recommendation div > p:last-child {
+  margin: 0;
+  color: #566a84;
+  font-size: 11px;
+}
+
+.recommendation-priority {
+  align-self: start;
+  padding: 5px 8px;
+  border: 1px solid #d5e3f7;
+  border-radius: 99px;
+  background: #fff;
+  color: #42638d;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.recommendation-reason {
+  margin: 8px 2px 0;
+  color: #718096;
+  font-size: 10px;
+}
+
+.guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.guide-actions .feedback {
+  flex-basis: 100%;
+  margin: 0;
+}
+
 .section-heading {
   display: flex;
   align-items: flex-end;
@@ -941,6 +1162,59 @@ textarea:focus-visible {
   .section {
     margin-bottom: 32px;
     scroll-margin-top: 126px;
+  }
+
+  .guide-card {
+    padding: 15px;
+  }
+
+  .guide-divider {
+    align-items: flex-start;
+  }
+
+  .guide-divider > span {
+    font-size: 10px;
+  }
+
+  .guide-step {
+    grid-template-columns: 27px minmax(0, 1fr);
+    gap: 9px;
+    padding: 12px 10px;
+  }
+
+  .step-number {
+    width: 27px;
+    height: 27px;
+  }
+
+  .step-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .step-content h4,
+  .step-content > p,
+  .step-command {
+    grid-column: auto;
+  }
+
+  .step-content > p {
+    margin: -6px 0 1px;
+  }
+
+  .guide-recommendation {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 9px;
+    padding: 13px;
+  }
+
+  .recommendation-icon {
+    width: 31px;
+    height: 31px;
+  }
+
+  .recommendation-priority {
+    grid-column: 2;
+    justify-self: start;
   }
 
   .section-heading h2 {
