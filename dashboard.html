@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10243e">
+  <meta name="description" content="Dashboard ส่วนตัวของ IT Support Toolkit">
+  <title>Dashboard | IT Support Toolkit</title>
+  <link rel="stylesheet" href="css/auth.css">
+  <script type="module" src="js/dashboard.js"></script>
+</head>
+<body>
+  <main class="auth-shell dashboard-shell">
+    <a class="brand" href="index.html" aria-label="กลับไปยัง Toolkit">
+      <span class="brand-mark" aria-hidden="true">IT</span>
+      <span class="brand-name">IT Support <span>TOOLKIT</span></span>
+    </a>
+
+    <section class="auth-card dashboard-card" aria-labelledby="dashboard-title">
+      <p class="eyebrow">PERSONAL IT SUPPORT TOOLKIT</p>
+      <h1 id="dashboard-title">Dashboard</h1>
+      <p class="intro">ภาพรวมบัญชีที่เข้าสู่ระบบ</p>
+
+      <p class="feedback feedback-panel" id="dashboard-status" role="status" aria-live="polite">
+        กำลังตรวจสอบ Session...
+      </p>
+      <button class="button button-secondary retry-button" id="dashboard-retry" type="button" hidden>
+        ลองตรวจสอบอีกครั้ง
+      </button>
+
+      <div id="dashboard-content" hidden>
+        <section class="account-panel" aria-labelledby="account-heading">
+          <h2 id="account-heading">บัญชีของคุณ</h2>
+          <dl class="account-details">
+            <div>
+              <dt>อีเมล</dt>
+              <dd id="account-email"></dd>
+            </div>
+            <div>
+              <dt>สถานะ</dt>
+              <dd>เข้าสู่ระบบแล้ว</dd>
+            </div>
+          </dl>
+        </section>
+
+        <p class="dashboard-scope">
+          Dashboard ระยะเริ่มต้นแสดงเฉพาะข้อมูลบัญชีจาก Supabase Auth
+          ยังไม่มีการเชื่อมฐานข้อมูลหรือแสดง Tickets และ Assets
+        </p>
+
+        <div class="dashboard-actions">
+          <a class="button button-secondary" href="index.html">เปิด Toolkit</a>
+          <button class="button button-primary" id="logout-button" type="button">ออกจากระบบ</button>
+        </div>
+        <p class="feedback" id="logout-feedback" role="status" aria-live="polite"></p>
+      </div>
+
+      <a class="back-link" href="login.html" id="login-link" hidden>ไปหน้าเข้าสู่ระบบ</a>
+    </section>
+
+    <p class="security-note">
+      การเปลี่ยนหน้าและซ่อนเนื้อหาเป็นการควบคุมฝั่ง UI เท่านั้น
+      อย่าใช้แทน Row Level Security หากเพิ่มข้อมูลส่วนตัวในฐานข้อมูลภายหลัง
+    </p>
+  </main>
+</body>
+</html>

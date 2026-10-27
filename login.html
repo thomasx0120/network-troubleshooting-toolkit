@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10243e">
+  <meta name="description" content="เข้าสู่ระบบ Personal IT Support Toolkit">
+  <title>เข้าสู่ระบบ | IT Support Toolkit</title>
+  <link rel="stylesheet" href="css/auth.css">
+  <script type="module" src="js/login.js"></script>
+</head>
+<body>
+  <main class="auth-shell">
+    <a class="brand" href="index.html" aria-label="กลับไปยัง Toolkit">
+      <span class="brand-mark" aria-hidden="true">IT</span>
+      <span class="brand-name">IT Support <span>TOOLKIT</span></span>
+    </a>
+
+    <section class="auth-card" aria-labelledby="login-title">
+      <p class="eyebrow">PERSONAL IT SUPPORT TOOLKIT</p>
+      <h1 id="login-title">เข้าสู่ระบบ</h1>
+      <p class="intro">ใช้บัญชีที่ผู้ดูแลสร้างไว้เพื่อเปิด Dashboard ส่วนตัว</p>
+
+      <form id="login-form">
+        <label class="field" for="email">
+          <span>อีเมล</span>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="username"
+            maxlength="254"
+            required
+            autofocus
+          >
+        </label>
+
+        <label class="field" for="password">
+          <span>รหัสผ่าน</span>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+        </label>
+
+        <button class="button button-primary" id="login-button" type="submit" disabled>
+          <span id="login-button-label">กำลังเตรียมระบบ...</span>
+        </button>
+        <p class="feedback" id="login-feedback" role="status" aria-live="polite"></p>
+        <button class="button button-secondary retry-button" id="auth-retry" type="button" hidden>
+          ลองตรวจสอบอีกครั้ง
+        </button>
+      </form>
+
+      <p class="auth-note">ไม่มีระบบสมัครสมาชิกสาธารณะ หากยังไม่มีบัญชี กรุณาติดต่อเจ้าของโปรเจกต์</p>
+      <a class="back-link" href="index.html">กลับไปยัง Network Troubleshooting Toolkit</a>
+    </section>
+
+    <p class="security-note">
+      การตรวจ Session บนหน้านี้ควบคุมการแสดงผลของ UI เท่านั้น ไม่ใช่การป้องกันข้อมูลลับแทน RLS
+      ขณะนี้ Dashboard ยังไม่อ่านข้อมูลจากฐานข้อมูล
+    </p>
+  </main>
+</body>
+</html>
