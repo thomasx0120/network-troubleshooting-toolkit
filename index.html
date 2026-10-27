@@ -6,11 +6,22 @@
   <meta name="theme-color" content="#10243e">
   <meta name="description" content="แดชบอร์ดช่วยตรวจสอบและแก้ไขปัญหาเครือข่ายสำหรับเจ้าหน้าที่ IT Support">
   <title>Network Troubleshooting Toolkit</title>
-  <link rel="stylesheet" href="style.css?v=3">
-  <script src="script.js?v=3" defer></script>
+  <link rel="stylesheet" href="style.css?v=6">
+  <script type="module" src="js/index-auth.js?v=7"></script>
 </head>
 <body>
-  <a class="skip-link" href="#main-content">ข้ามไปยังเนื้อหาหลัก</a>
+  <section class="auth-gate" id="auth-gate" aria-labelledby="auth-gate-title">
+    <p class="eyebrow">PERSONAL IT SUPPORT TOOLKIT</p>
+    <h1 id="auth-gate-title">กำลังตรวจสอบ Session...</h1>
+    <p class="auth-gate-status" id="auth-gate-status" role="status" aria-live="polite">
+      กรุณารอสักครู่ก่อนเข้าใช้งาน Toolkit
+    </p>
+    <button class="button button-secondary" id="auth-retry" type="button" hidden>ลองตรวจสอบอีกครั้ง</button>
+    <a class="back-link" id="auth-login-link" href="login.html" hidden>ไปหน้าเข้าสู่ระบบ</a>
+  </section>
+
+  <div id="toolkit-app" hidden>
+    <a class="skip-link" href="#main-content">ข้ามไปยังเนื้อหาหลัก</a>
 
   <header class="site-header">
     <div class="container header-content">
@@ -26,7 +37,15 @@
         <a href="#checklist">รายการตรวจสอบ</a>
         <a href="#notes-section">บันทึกช่วยจำ</a>
       </nav>
-      <span class="local-badge"><span aria-hidden="true"></span> ใช้งานส่วนตัว</span>
+      <div class="header-tools">
+        <span class="local-badge"><span aria-hidden="true"></span> ใช้งานส่วนตัว</span>
+        <section class="account-area" aria-label="สถานะบัญชี">
+          <span class="account-status" id="account-status" role="status" aria-live="polite">กำลังตรวจสอบบัญชี...</span>
+          <span class="account-email" id="account-email" hidden></span>
+          <button class="button button-secondary account-action" id="account-logout" type="button" hidden>ออกจากระบบ</button>
+          <a class="button button-secondary account-action" id="account-login" href="login.html" hidden>เข้าสู่ระบบ</a>
+        </section>
+      </div>
     </div>
   </header>
 
@@ -456,5 +475,6 @@
   <footer class="site-footer">
     <div class="container footer-content"><span>Network Troubleshooting Toolkit</span><span>เครื่องมือช่วยตรวจสอบเครือข่ายสำหรับ IT Support</span></div>
   </footer>
+  </div>
 </body>
 </html>

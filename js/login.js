@@ -39,7 +39,7 @@ async function initializeLogin() {
     }
 
     if (data.session) {
-      window.location.replace("dashboard.html");
+      window.location.replace("index.html");
       return;
     }
 
@@ -85,7 +85,7 @@ loginForm.addEventListener("submit", async (event) => {
       return;
     }
 
-    window.location.replace("dashboard.html");
+    window.location.replace("index.html");
   } catch (error) {
     showFeedback(getFriendlyAuthError(error), true);
     isBusy = false;

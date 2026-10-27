@@ -8,9 +8,10 @@ const SDK_URL = "https://esm.sh/@supabase/supabase-js@2.118.0";
 const SDK_LOAD_TIMEOUT_MS = 15000;
 let clientPromise;
 
-function createSdkLoadError() {
+function createSdkLoadError(cause) {
   const error = new Error("ไม่สามารถโหลด Supabase Client ได้");
   error.code = "SUPABASE_SDK_LOAD_FAILED";
+  error.cause = cause;
   return error;
 }
 
@@ -39,8 +40,8 @@ export function getSupabaseClient() {
     });
 
     clientPromise = Promise.race([sdkPromise, timeoutPromise])
-      .catch(() => {
-        throw createSdkLoadError();
+      .catch((cause) => {
+        throw createSdkLoadError(cause);
       })
       .finally(() => window.clearTimeout(timeoutId));
 
