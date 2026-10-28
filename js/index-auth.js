@@ -10,6 +10,7 @@ const logoutButton = document.querySelector("#account-logout");
 const loginUrl = new URL("../login.html", import.meta.url);
 const AUTH_MODULE_URL = new URL("./auth.js", import.meta.url);
 const TOOLKIT_SCRIPT_URL = new URL("../script.js?v=3", import.meta.url);
+const PERSONAL_SUPPORT_SCRIPT_URL = new URL("./personal-support.js?v=2", import.meta.url);
 const AUTH_MODULE_TIMEOUT_MS = 15000;
 const SESSION_CHECK_TIMEOUT_MS = 15000;
 const TOOLKIT_SCRIPT_TIMEOUT_MS = 15000;
@@ -149,7 +150,8 @@ function loadToolkitScript() {
       TOOLKIT_SCRIPT_TIMEOUT_MS,
       "TOOLKIT_SCRIPT_TIMEOUT",
       `Timed out importing ${scriptUrl.pathname}`
-    ).then(() => {
+    ).then(async () => {
+      await import(PERSONAL_SUPPORT_SCRIPT_URL.href);
       showToolkit();
     }).catch((error) => {
       toolkitScriptPromise = undefined;

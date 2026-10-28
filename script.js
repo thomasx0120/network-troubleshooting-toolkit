@@ -15,14 +15,31 @@ function showFeedback(element, message, isError = false) {
   element.classList.toggle("is-error", isError);
 }
 
-function readSavedData() {
+function backupRecoverableData(saved) {
+  if (!saved) return;
+  const baseKey = `${STORAGE_KEY}.recoverable-backup`;
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : {};
-  } catch (error) {
+    if (!localStorage.getItem(baseKey)) {
+      localStorage.setItem(baseKey, saved);
+      return;
+    }
+    localStorage.setItem(`${baseKey}-${new Date().toISOString().replace(/[:.]/g, "-")}`, saved);
+  } catch {}
+}
+
+function readSavedData() {
+  let saved;
+  try {
+    saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return {};
+    const parsed = JSON.parse(saved);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+  } catch (error) {}
+  if (saved) {
     storageReadError = true;
-    return {};
+    backupRecoverableData(saved);
   }
+  return {};
 }
 
 function saveData(data) {
@@ -59,6 +76,13 @@ if (storageReadError) {
 }
 
 function persistCurrentData() {
+  let latestRecords = savedData.records;
+  let latestInventory = savedData.inventory;
+  try {
+    const latestStoredData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    if (Array.isArray(latestStoredData.records)) latestRecords = latestStoredData.records;
+    if (Array.isArray(latestStoredData.inventory)) latestInventory = latestStoredData.inventory;
+  } catch {}
   const formData = Object.fromEntries(new FormData(networkForm).entries());
   const checklist = Object.fromEntries(checklistItems.map((checkbox) => [checkbox.dataset.check, checkbox.checked]));
   const guideFormData = Object.fromEntries(new FormData(guidedForm).entries());
@@ -66,15 +90,18 @@ function persistCurrentData() {
   const stageNotes = Object.fromEntries(guideNotes.map((input) => [input.dataset.stageNote, input.value]));
   savedData = {
     ...savedData,
+    records: latestRecords,
+    inventory: latestInventory,
     form: formData,
     checklist,
     quickNotes: notesField.value,
     guidedSession: { ...guideFormData, stages, stageNotes }
   };
 
-  const didSave = saveData(savedData);
-  savedState.textContent = didSave ? "บันทึกในเครื่องนี้" : "บันทึกไม่สำเร็จ";
-  notesSaveStatus.textContent = didSave ? "บันทึกอัตโนมัติในเครื่องนี้" : "บันทึกไม่สำเร็จ กรุณาตรวจสอบพื้นที่จัดเก็บ";
+  const didSave = !storageReadError && saveData(savedData);
+  if (storageReadError) savedState.textContent = "พบข้อมูลเดิมที่อ่านไม่ได้—ข้อมูลสำรองถูกเก็บไว้";
+  else savedState.textContent = didSave ? "บันทึกในเครื่องนี้" : "บันทึกไม่สำเร็จ";
+  notesSaveStatus.textContent = storageReadError ? "ข้อมูลเดิมถูกสำรองไว้ ยังไม่เขียนทับ" : (didSave ? "บันทึกอัตโนมัติในเครื่องนี้" : "บันทึกไม่สำเร็จ กรุณาตรวจสอบพื้นที่จัดเก็บ");
 }
 
 async function copyText(text, feedbackElement, successMessage) {
@@ -464,6 +491,10 @@ const archiveFeedback = document.querySelector("#archive-feedback");
 const importCasesFile = document.querySelector("#import-cases-file");
 
 function saveArchive() {
+  if (storageReadError) {
+    savedState.textContent = "พบข้อมูลเดิมที่อ่านไม่ได้—ยังไม่เขียนทับข้อมูลต้นฉบับ";
+    return false;
+  }
   const didSave = saveData(savedData);
   savedState.textContent = didSave ? "บันทึกในเครื่องนี้" : "บันทึกไม่สำเร็จ";
   return didSave;

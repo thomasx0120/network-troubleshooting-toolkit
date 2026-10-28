@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#10243e">
   <meta name="description" content="แดชบอร์ดช่วยตรวจสอบและแก้ไขปัญหาเครือข่ายสำหรับเจ้าหน้าที่ IT Support">
-  <title>Network Troubleshooting Toolkit</title>
+  <title>Personal IT Support Toolkit</title>
   <link rel="stylesheet" href="style.css?v=6">
   <script type="module" src="js/index-auth.js?v=7"></script>
 </head>
@@ -30,12 +30,12 @@
         <span class="brand-name">IT Support <span>TOOLKIT</span></span>
       </a>
       <nav class="top-nav" aria-label="เมนูหลัก">
-        <a href="#guided-troubleshooter">ผู้ช่วยแก้ปัญหา</a>
-        <a href="#saved-cases">เคสที่บันทึก</a>
-        <a href="#commands">คำสั่งเครือข่าย</a>
-        <a href="#device-info">ข้อมูลอุปกรณ์</a>
-        <a href="#checklist">รายการตรวจสอบ</a>
-        <a href="#notes-section">บันทึกช่วยจำ</a>
+        <a href="#support-dashboard">ภาพรวม</a>
+        <a href="#guided-troubleshooter">วิเคราะห์ปัญหา</a>
+        <a href="#case-manager">จัดการเคส</a>
+        <a href="#inventory">ทะเบียน PC</a>
+        <a href="#backup-manager">Backup</a>
+        <a href="#commands">คลังคำสั่ง</a>
       </nav>
       <div class="header-tools">
         <span class="local-badge"><span aria-hidden="true"></span> ใช้งานส่วนตัว</span>
@@ -53,8 +53,8 @@
     <section class="welcome-panel" id="top" aria-labelledby="welcome-title">
       <div class="welcome-copy">
         <p class="eyebrow eyebrow-light">NETWORK OPERATIONS · เครื่องมือสำหรับ Windows</p>
-        <h1 id="welcome-title">Network Troubleshooting Toolkit</h1>
-        <p>รวมเครื่องมือพื้นฐานไว้ที่เดียว ช่วยให้ตรวจสอบปัญหาเครือข่ายได้เป็นขั้นตอนและบันทึกผลได้สะดวก</p>
+        <h1 id="welcome-title">Personal IT Support Toolkit</h1>
+        <p>รวมเครื่องมือช่วยงาน IT Support สำหรับตรวจสอบ บันทึกเคส จัดการทะเบียนอุปกรณ์ และรายงานงานประจำวัน</p>
         <a class="button button-light" href="#guided-troubleshooter">เริ่มวิเคราะห์ปัญหา <span aria-hidden="true">↓</span></a>
       </div>
       <div class="welcome-art" aria-hidden="true">
@@ -65,6 +65,14 @@
         <span class="orbit-node node-two">DNS</span>
         <span class="orbit-node node-three">↗</span>
       </div>
+    </section>
+
+    <section class="section support-dashboard" id="support-dashboard" aria-labelledby="support-dashboard-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">ภาพรวมงาน</p><h2 id="support-dashboard-heading">Dashboard IT Support</h2></div>
+        <button class="button button-secondary" type="button" id="daily-report-open">สร้างรายงานประจำวัน</button>
+      </div>
+      <div class="dashboard-stat-grid" id="support-dashboard-stats"></div>
     </section>
 
     <section class="overview-grid" aria-label="ภาพรวมการตรวจสอบ">
@@ -293,6 +301,98 @@
       </div>
     </section>
 
+    <section class="section" id="case-manager" aria-labelledby="case-manager-heading">
+      <div class="section-heading"><div><p class="eyebrow">Case Management</p><h2 id="case-manager-heading">จัดการเคส IT Support</h2><p class="section-intro">สร้าง เปิดแก้ไข ค้นหา และรายงานเคสจากข้อมูลที่บันทึกจริง</p></div><button class="button button-primary" type="button" id="new-case-button">+ เคสใหม่</button></div>
+      <div class="card case-manager-card">
+        <div class="case-toolbar">
+          <label class="field"><span>ค้นหาเลขเคส / หัวข้อ / ผู้แจ้ง / อุปกรณ์</span><input id="case-search" type="search" placeholder="ค้นหา..."></label>
+          <label class="field"><span>ประเภท</span><select id="case-filter-type"><option value="">ทั้งหมด</option><option>Network</option><option>PC</option><option>Printer</option><option>Scanner</option><option>NAS</option><option>CCTV</option><option>Software</option><option>Other</option></select></label>
+          <label class="field"><span>สถานะ</span><select id="case-filter-status"><option value="">ทั้งหมด</option><option>Open</option><option>In Progress</option><option>Waiting</option><option>Resolved</option></select></label>
+          <label class="field"><span>วันที่</span><input id="case-filter-date" type="date"></label>
+        </div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>เลขเคส</th><th>ปัญหา</th><th>อุปกรณ์</th><th>สถานะ</th><th>วันที่</th><th>การดำเนินการ</th></tr></thead><tbody id="case-table-body"></tbody></table></div>
+        <p class="empty-state" id="case-empty" hidden>ยังไม่มีเคส ให้กด “เคสใหม่” เพื่อเริ่มบันทึกงานจริง</p>
+      </div>
+    </section>
+
+    <dialog class="support-dialog" id="case-dialog">
+      <form method="dialog" class="support-dialog-form" id="case-form">
+        <div class="dialog-heading"><div><p class="eyebrow">รายละเอียดเคส</p><h2 id="case-form-heading">สร้างเคสใหม่</h2></div><button class="icon-button" type="button" data-close-dialog="case-dialog" aria-label="ปิด">×</button></div>
+        <input type="hidden" name="id">
+        <div class="form-grid">
+          <label class="field"><span>เลขเคส</span><input name="caseNumber" readonly></label>
+          <label class="field"><span>วันที่และเวลา</span><input name="createdAt" type="datetime-local"></label>
+          <label class="field"><span>สาขา</span><input name="branch" maxlength="80"></label>
+          <label class="field"><span>แผนก</span><input name="department" maxlength="80"></label>
+          <label class="field"><span>ผู้แจ้ง</span><input name="reporter" maxlength="80"></label>
+          <label class="field"><span>ประเภทปัญหา</span><select name="type"><option>Network</option><option>PC</option><option>Printer</option><option>Scanner</option><option>NAS</option><option>CCTV</option><option>Software</option><option>Other</option></select></label>
+          <label class="field"><span>Computer Name</span><input name="computerName" maxlength="100" list="inventory-computer-names"></label>
+          <label class="field"><span>IP Address</span><input name="ipAddress" maxlength="45"></label>
+          <label class="field"><span>สถานะ</span><select name="status"><option>Open</option><option>In Progress</option><option>Waiting</option><option>Resolved</option></select></label>
+        </div>
+        <label class="field"><span>รายละเอียดอาการและผลกระทบ</span><textarea name="symptomDetail" rows="3" required></textarea></label>
+        <label class="field"><span>ขั้นตอนตรวจสอบและผลที่พบ</span><textarea name="investigation" rows="3"></textarea></label>
+        <div class="form-grid">
+          <label class="field"><span>สาเหตุที่คาดการณ์</span><textarea name="suspectedCause" rows="3"></textarea></label>
+          <label class="field"><span>สาเหตุที่ยืนยันแล้ว</span><textarea name="confirmedCause" rows="3"></textarea></label>
+          <label class="field"><span>วิธีแก้ไข</span><textarea name="resolution" rows="3"></textarea></label>
+          <label class="field"><span>ผลทดสอบหลังแก้</span><textarea name="postTest" rows="3"></textarea></label>
+        </div>
+        <label class="field"><span>หมายเหตุและงานติดตามต่อ</span><textarea name="notes" rows="3"></textarea></label>
+        <p class="feedback" id="case-form-feedback" role="status"></p>
+        <div class="dialog-actions"><button class="button button-primary" type="submit">บันทึกเคส</button><button class="button button-secondary" type="button" data-close-dialog="case-dialog">ยกเลิก</button></div>
+      </form>
+    </dialog>
+
+    <section class="section" id="inventory" aria-labelledby="inventory-heading">
+      <div class="section-heading"><div><p class="eyebrow">PC Inventory</p><h2 id="inventory-heading">ทะเบียนคอมพิวเตอร์</h2><p class="section-intro">ข้อมูลจากการบันทึกหรือการนำเข้าของผู้ใช้เท่านั้น ไม่ตรวจอุปกรณ์อัตโนมัติ</p></div><button class="button button-primary" type="button" id="new-inventory-button">+ เพิ่มเครื่อง</button></div>
+      <div class="card inventory-card">
+        <div class="inventory-toolbar"><label class="search-box"><span class="visually-hidden">ค้นหาเครื่อง</span><input id="inventory-search" type="search" placeholder="ค้นหาชื่อเครื่อง IP ผู้ใช้หรือสาขา"></label><button class="button button-secondary" type="button" id="export-inventory-json">Export JSON</button><button class="button button-secondary" type="button" id="export-inventory-csv">Export CSV</button><button class="button button-secondary" type="button" id="import-inventory-button">Import JSON/CSV</button><input id="import-inventory-file" type="file" accept=".json,.csv,text/csv,application/json" hidden></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Computer Name</th><th>ผู้ใช้ / แผนก</th><th>IP</th><th>Windows / License</th><th>ตรวจล่าสุด</th><th>การดำเนินการ</th></tr></thead><tbody id="inventory-table-body"></tbody></table></div>
+        <p class="empty-state" id="inventory-empty" hidden>ยังไม่มีรายการในทะเบียน PC</p><p class="feedback" id="inventory-feedback"></p>
+      </div>
+    </section>
+
+    <dialog class="support-dialog" id="inventory-dialog"><form method="dialog" class="support-dialog-form" id="inventory-form">
+      <div class="dialog-heading"><div><p class="eyebrow">ข้อมูลคอมพิวเตอร์</p><h2 id="inventory-form-heading">เพิ่มเครื่อง</h2></div><button class="icon-button" type="button" data-close-dialog="inventory-dialog" aria-label="ปิด">×</button></div>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label class="field"><span>Computer Name *</span><input name="computerName" required maxlength="100"></label><label class="field"><span>ผู้ใช้งาน</span><input name="userName" maxlength="100"></label>
+        <label class="field"><span>แผนก</span><input name="department" maxlength="80"></label><label class="field"><span>สาขา</span><input name="branch" maxlength="80"></label>
+        <label class="field"><span>IP Address</span><input name="ipAddress" maxlength="45"></label><label class="field"><span>Gateway</span><input name="gateway" maxlength="45"></label>
+        <label class="field"><span>Subnet Mask</span><input name="subnetMask" maxlength="45"></label><label class="field"><span>วันที่ตรวจสอบล่าสุด</span><input name="lastChecked" type="date"></label>
+        <label class="field"><span>CPU</span><input name="cpu" maxlength="100"></label><label class="field"><span>RAM</span><input name="ram" maxlength="50"></label>
+        <label class="field"><span>Storage</span><input name="storage" maxlength="100"></label><label class="field"><span>Windows Version</span><input name="windowsVersion" maxlength="100"></label>
+        <label class="field"><span>สถานะ License ที่บันทึกไว้</span><input name="licenseStatus" maxlength="100"></label>
+      </div>
+      <label class="field"><span>โปรแกรมสำคัญและอาการที่พบ</span><textarea name="softwareIssues" rows="3"></textarea></label>
+      <label class="field"><span>คำแนะนำอัปเกรดหรือเปลี่ยนอุปกรณ์</span><textarea name="upgradeAdvice" rows="3"></textarea></label>
+      <label class="field"><span>หมายเหตุ</span><textarea name="notes" rows="3"></textarea></label>
+      <p class="feedback" id="inventory-form-feedback"></p><div class="dialog-actions"><button class="button button-primary" type="submit">บันทึกทะเบียน</button><button class="button button-secondary" type="button" data-close-dialog="inventory-dialog">ยกเลิก</button></div>
+    </form></dialog>
+
+    <datalist id="inventory-computer-names"></datalist>
+
+    <section class="section" id="backup-manager" aria-labelledby="backup-heading">
+      <div class="section-heading"><div><p class="eyebrow">Data Protection</p><h2 id="backup-heading">Backup Manager</h2><p class="section-intro">สำรอง ส่งออก นำเข้า และกู้คืนข้อมูลในเครื่องโดยไม่ส่งข้อมูลไป Supabase</p></div><button class="button button-primary" type="button" id="create-backup-button">สร้าง Backup ตอนนี้</button></div>
+      <div class="card backup-card">
+        <div class="backup-toolbar"><button class="button button-secondary" type="button" id="export-backup-button" disabled>Export Backup เป็น JSON</button><button class="button button-secondary" type="button" id="import-backup-button">Import และตรวจสอบไฟล์</button><input id="import-backup-file" type="file" accept="application/json,.json" hidden></div>
+        <div class="table-wrap"><table class="data-table backup-table"><thead><tr><th>Backup</th><th>เวลาที่บันทึก/ได้รับจากไฟล์</th><th>ขนาด</th><th>สรุปข้อมูล</th><th>การดำเนินการ</th></tr></thead><tbody id="backup-table-body"></tbody></table></div>
+        <p class="empty-state" id="backup-empty" hidden>ยังไม่มี Backup ใน Browser</p>
+        <p class="feedback" id="backup-feedback" role="status" aria-live="polite"></p>
+      </div>
+      <p class="archive-privacy">การกู้คืนจะสำรองข้อมูลปัจจุบันออกเป็น Backup อัตโนมัติก่อนเสมอ หากข้อมูลปัจจุบันมีรูปแบบเสียหาย ระบบจะไม่เขียนทับข้อมูลต้นฉบับ</p>
+    </section>
+
+    <section class="section" id="printer-troubleshooter" aria-labelledby="printer-heading">
+      <div class="section-heading"><div><p class="eyebrow">Printer Troubleshooter</p><h2 id="printer-heading">แยกปัญหาเครื่องพิมพ์ตามอาการ</h2></div></div>
+      <div class="card printer-card"><label class="field"><span>อาการที่พบ</span><select id="printer-symptom">
+        <option value="ping-fail">Ping IP ไม่ผ่าน</option><option value="ping-ok-print-fail">Ping ผ่านแต่พิมพ์ไม่ได้</option><option value="offline">Printer Offline</option><option value="queue">Print Queue ค้าง</option><option value="driver-port">Driver หรือ Printer Port ผิด</option><option value="lan-share">แชร์เครื่องพิมพ์ผ่าน LAN ไม่ได้</option><option value="scan-fail">พิมพ์ได้แต่สแกนไม่ได้</option><option value="usb-network">เครื่องพิมพ์ USB และ Network Printer</option>
+      </select></label><div id="printer-guide" class="printer-guide"></div></div>
+    </section>
+
+    <section class="section" id="daily-report" aria-labelledby="daily-report-heading"><div class="section-heading"><div><p class="eyebrow">รายงานประจำวัน</p><h2 id="daily-report-heading">สรุปงานจากเคสที่บันทึกจริง</h2></div><button class="button button-primary" type="button" id="generate-report">สร้างรายงานวันนี้</button></div><div class="card report-card"><textarea id="daily-report-text" rows="12" readonly placeholder="ยังไม่มีรายงาน กดสร้างรายงานวันนี้เพื่อสรุปจากเคสที่มีอยู่จริง"></textarea><button class="button button-primary" type="button" id="copy-daily-report">คัดลอกรายงานภาษาไทย</button><p class="feedback" id="report-feedback"></p></div></section>
+
     <section class="section" id="commands" aria-labelledby="commands-heading">
       <div class="section-heading">
         <div>
@@ -422,7 +522,8 @@
       <div class="section-heading">
         <div>
           <p class="eyebrow">ทำตามทีละขั้น</p>
-          <h2 id="checklist-heading">รายการตรวจสอบปัญหาเครือข่าย</h2>
+          <h2 id="checklist-heading">Checklist รับงานและปิดเคส</h2>
+          <p class="section-intro">รายการตรวจปฏิบัติหลังแก้ปัญหาและก่อนปิดงาน ไม่ทำซ้ำขั้นแก้ปัญหาหลัก</p>
           <p class="section-intro">ทำเครื่องหมายเมื่อดำเนินการแต่ละขั้นตอนแล้ว</p>
         </div>
       </div>
@@ -435,12 +536,12 @@
           <div class="progress-fill" id="progress-fill"></div>
         </div>
         <div class="checklist-items">
-          <label class="checklist-item"><input type="checkbox" data-check="cable"><span>ตรวจสอบสาย LAN หรือการเชื่อมต่อ Wi-Fi</span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="ipconfig"><span>เรียกใช้ <code>ipconfig /all</code></span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="gateway"><span>Ping ไปยัง Default Gateway</span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="public-ip"><span>Ping ไปยัง <code>8.8.8.8</code></span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="dns"><span>เรียกใช้ <code>nslookup google.com</code></span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="other-devices"><span>ตรวจสอบว่าอุปกรณ์อื่นพบปัญหาเดียวกันหรือไม่</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="cable"><span>ยืนยันผู้แจ้ง สาขา แผนก อาการและผลกระทบ</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="ipconfig"><span>ยืนยันชื่ออุปกรณ์ Computer Name และ IP Address</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="gateway"><span>บันทึกขั้นตอนตรวจสอบและผลที่พบแล้ว</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="public-ip"><span>ทดสอบการใช้งานหลังแก้ไขและบันทึกผล</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="dns"><span>แจ้งผู้แจ้งทราบ และยืนยันผู้ใช้เข้าถึงได้ตามปกติ</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="other-devices"><span>บันทึกสาเหตุ วิธีแก้ไข งานติดตาม และอัปเดตสถานะปิดเคส</span></label>
         </div>
       </div>
     </section>
