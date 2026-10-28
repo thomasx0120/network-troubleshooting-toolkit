@@ -134,6 +134,35 @@ export function upsertToolkitItem(items, candidate, currentId = "", createId = (
   return { ok: true, items: list, item, updated: false };
 }
 
+export function mergeNetworkInventory(existing, network, currentId = "", createId = () => "") {
+  const list = Array.isArray(existing) ? existing.map(item => ({ ...item })) : [];
+  const candidate = isPlainObject(network) ? network : {};
+  const duplicate = findDuplicateInventory(list, candidate, currentId);
+  const fields = ["computerName", "ipAddress", "subnetMask", "gateway", "dnsServer", "notes"];
+  const updates = Object.fromEntries(fields.filter(field => String(candidate[field] ?? "").trim() !== "").map(field => [field, String(candidate[field]).trim()]));
+  if (duplicate) {
+    const index = list.indexOf(duplicate);
+    list[index] = { ...duplicate, ...updates };
+    return { ok: true, items: list, item: list[index], updated: true };
+  }
+  const item = { id: String(createId()), ...updates };
+  list.push(item);
+  return { ok: true, items: list, item, updated: false };
+}
+
+export function upsertTroubleshootingCase(existing, candidate) {
+  if (!Array.isArray(existing) || !isPlainObject(candidate)) return { ok: false, reason: "invalid-input", items: existing };
+  const list = [...existing];
+  const id = String(candidate.id || "");
+  const index = id ? list.findIndex(item => String(item?.id || "") === id) : -1;
+  if (index >= 0) {
+    list[index] = { ...list[index], ...candidate };
+    return { ok: true, items: list, item: list[index], updated: true };
+  }
+  list.push(candidate);
+  return { ok: true, items: list, item: candidate, updated: false };
+}
+
 export function removeToolkitItem(items, id) {
   if (!Array.isArray(items)) return { ok: false, items, reason: "invalid-input" };
   const target = String(id);

@@ -41,6 +41,7 @@ class ToolkitStaticTests(unittest.TestCase):
         self.assertGreater(toolkit_position, -1)
         self.assertGreater(personal_position, toolkit_position)
         self.assertIn('personal-support.js?v=', self.auth)
+        self.assertIn('script.js?v=', self.auth)
         self.assertNotIn('toolkit-data.js', self.auth)
         self.assertNotIn('localStorage', self.auth)
 
@@ -58,6 +59,26 @@ class ToolkitStaticTests(unittest.TestCase):
         self.assertIn('from "./toolkit-data.js"', self.personal)
         self.assertIn('previousRaw = localStorage.getItem(STORAGE_KEY)', self.personal)
         self.assertIn('restore verification failed', self.personal)
+
+    def test_consolidated_case_and_inventory_controls(self):
+        self.assertNotIn('id="saved-cases"', self.html)
+        self.assertIn('เพิ่มผลตรวจเข้ารายการเคส', self.html)
+        self.assertIn('id="daily-report-open">ไปยังรายงานประจำวัน', self.html)
+        self.assertIn('id="add-network-to-inventory"', self.html)
+        self.assertIn('toolkit:create-case', self.personal)
+        self.assertIn('toolkit:add-inventory', self.personal)
+        self.assertIn('symptomDetail', (ROOT / 'script.js').read_text(encoding='utf-8'))
+        self.assertIn('resolution:', (ROOT / 'script.js').read_text(encoding='utf-8'))
+
+    def test_cache_versions(self):
+        html = self.html
+        auth = self.auth
+        self.assertIn('style.css?v=', html)
+        self.assertIn('js/index-auth.js?v=', html)
+        self.assertIn('script.js?v=', auth)
+        self.assertIn('personal-support.js?v=', auth)
+        self.assertIn('../script.js?v=4', auth)
+        self.assertIn('./personal-support.js?v=3', auth)
 
     def test_no_service_role_or_secret_keys(self):
         text = '\n'.join((ROOT / file).read_text(encoding='utf-8', errors='ignore') for file in ['js/supabase-config.js', 'js/auth.js', 'js/login.js'])

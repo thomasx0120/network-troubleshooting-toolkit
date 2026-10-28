@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#10243e">
   <meta name="description" content="แดชบอร์ดช่วยตรวจสอบและแก้ไขปัญหาเครือข่ายสำหรับเจ้าหน้าที่ IT Support">
   <title>Personal IT Support Toolkit</title>
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
   <script type="module" src="js/index-auth.js?v=7"></script>
 </head>
 <body>
@@ -70,7 +70,7 @@
     <section class="section support-dashboard" id="support-dashboard" aria-labelledby="support-dashboard-heading">
       <div class="section-heading">
         <div><p class="eyebrow">ภาพรวมงาน</p><h2 id="support-dashboard-heading">Dashboard IT Support</h2></div>
-        <button class="button button-secondary" type="button" id="daily-report-open">สร้างรายงานประจำวัน</button>
+        <button class="button button-secondary" type="button" id="daily-report-open">ไปยังรายงานประจำวัน</button>
       </div>
       <div class="dashboard-stat-grid" id="support-dashboard-stats"></div>
     </section>
@@ -82,7 +82,7 @@
       </article>
       <article class="overview-card">
         <span class="overview-icon icon-green" aria-hidden="true">✓</span>
-        <div><p>ขั้นตอนที่ตรวจแล้ว</p><strong id="overview-progress">0 <span>จาก 6 ขั้นตอน</span></strong></div>
+        <div><p>ขั้นตอนที่ตรวจแล้ว</p><strong id="overview-progress">0 <span>จาก 6 ขั้นตอนตรวจสอบ</span></strong></div>
       </article>
       <article class="overview-card">
         <span class="overview-icon icon-purple" aria-hidden="true">PC</span>
@@ -268,36 +268,12 @@
           <p class="recommendation-reason" id="recommendation-reason">ทำตามลำดับจากการตรวจเบื้องต้นไปสู่การทดสอบเครือข่ายและ DNS</p>
 
           <div class="guide-actions">
-            <button class="button button-primary" type="button" id="save-case">บันทึกเคสนี้</button>
+            <button class="button button-primary" type="button" id="save-case">เพิ่มผลตรวจเข้ารายการเคส</button>
             <button class="button button-primary" type="button" id="copy-guide-report">คัดลอกรายงานตรวจสอบ</button>
             <button class="button button-secondary" type="reset">เริ่มบันทึกปัญหาใหม่</button>
             <p class="feedback" id="guide-feedback" role="status" aria-live="polite"></p>
           </div>
         </form>
-      </div>
-    </section>
-
-    <section class="section" id="saved-cases" aria-labelledby="saved-cases-heading">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">คลังประวัติการแก้ไข</p>
-          <h2 id="saved-cases-heading">เคสที่บันทึกไว้</h2>
-          <p class="section-intro">บันทึกแต่ละครั้งจะแยกเก็บเป็นเคส ไม่ทับข้อมูลเคสอื่น</p>
-        </div>
-      </div>
-      <div class="card archive-card">
-        <div class="archive-toolbar">
-          <span class="archive-count" id="saved-case-count">มีเคสที่บันทึก 0 รายการ</span>
-          <div class="archive-actions">
-            <button class="button button-secondary" type="button" id="import-cases">นำเข้าไฟล์ JSON</button>
-            <button class="button button-primary" type="button" id="export-cases" disabled>ดาวน์โหลดข้อมูลทั้งหมด</button>
-            <input class="visually-hidden" id="import-cases-file" type="file" accept="application/json,.json" tabindex="-1" hidden>
-          </div>
-        </div>
-        <p class="archive-privacy">ไฟล์ส่งออกอาจมี IP Address ชื่อเครื่อง และบันทึกภายใน ตรวจสอบข้อมูลก่อนส่งให้ผู้อื่น</p>
-        <div class="saved-case-list" id="saved-case-list"></div>
-        <p class="empty-state" id="empty-saved-cases">ยังไม่มีเคสที่บันทึก กรอกแบบฟอร์มด้านบนแล้วกด “บันทึกเคสนี้”</p>
-        <p class="feedback" id="archive-feedback" role="status" aria-live="polite"></p>
       </div>
     </section>
 
@@ -478,7 +454,7 @@
         <div>
           <p class="eyebrow">รายละเอียดอุปกรณ์</p>
           <h2 id="info-heading">ข้อมูลเครือข่ายของเครื่อง</h2>
-          <p class="section-intro">ข้อมูลจะบันทึกไว้ในเบราว์เซอร์เครื่องนี้โดยอัตโนมัติ</p>
+          <p class="section-intro">ใช้ตรวจสอบข้อมูลเครื่องและส่งไป PC Inventory เมื่อต้องการ ไม่ใช้เป็นที่เก็บข้อมูลซ้ำ</p>
         </div>
       </div>
       <div class="card form-card">
@@ -511,6 +487,7 @@
           </div>
           <div class="button-row">
             <button class="button button-primary" type="button" id="copy-info">คัดลอกข้อมูล</button>
+            <button class="button button-secondary" type="button" id="add-network-to-inventory">เพิ่ม/อัปเดตใน PC Inventory</button>
             <button class="button button-secondary" type="reset">ล้างแบบฟอร์ม</button>
           </div>
         </form>
@@ -529,19 +506,18 @@
       </div>
       <div class="card checklist-card">
         <div class="progress-heading">
-          <div><strong>ความคืบหน้าการตรวจสอบ</strong><span id="progress-count">เสร็จแล้ว 0 จาก 6 ข้อ</span></div>
+          <div><strong>ความคืบหน้าการปิดเคส</strong><span id="progress-count">เสร็จแล้ว 0 จาก 5 ข้อ</span></div>
           <button class="text-button" type="button" id="reset-checklist">เริ่มรายการใหม่</button>
         </div>
-        <div class="progress-track" id="progress-track" role="progressbar" aria-label="ความคืบหน้ารายการตรวจสอบ" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0">
+        <div class="progress-track" id="progress-track" role="progressbar" aria-label="ความคืบหน้ารายการปิดเคส" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0">
           <div class="progress-fill" id="progress-fill"></div>
         </div>
         <div class="checklist-items">
           <label class="checklist-item"><input type="checkbox" data-check="cable"><span>ยืนยันผู้แจ้ง สาขา แผนก อาการและผลกระทบ</span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="ipconfig"><span>ยืนยันชื่ออุปกรณ์ Computer Name และ IP Address</span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="gateway"><span>บันทึกขั้นตอนตรวจสอบและผลที่พบแล้ว</span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="public-ip"><span>ทดสอบการใช้งานหลังแก้ไขและบันทึกผล</span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="dns"><span>แจ้งผู้แจ้งทราบ และยืนยันผู้ใช้เข้าถึงได้ตามปกติ</span></label>
-          <label class="checklist-item"><input type="checkbox" data-check="other-devices"><span>บันทึกสาเหตุ วิธีแก้ไข งานติดตาม และอัปเดตสถานะปิดเคส</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="ipconfig"><span>ยืนยันข้อมูลเคสและอุปกรณ์ตรงกับ PC Inventory</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="gateway"><span>ยืนยันผู้แจ้งรับทราบสาเหตุและวิธีแก้ไข</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="public-ip"><span>บันทึกงานติดตามและผู้รับผิดชอบ</span></label>
+          <label class="checklist-item"><input type="checkbox" data-check="dns"><span>อัปเดตสถานะเคสและยืนยันปิดงานใน Case Management</span></label>
         </div>
       </div>
     </section>

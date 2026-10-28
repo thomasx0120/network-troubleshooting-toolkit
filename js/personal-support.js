@@ -1,4 +1,4 @@
-﻿import { findDuplicateInventory, parseStoredToolkitData, unwrapBackup, validateToolkitData, buildDailyReport, createBackupEnvelope } from "./toolkit-data.js";
+﻿import { findDuplicateInventory, parseStoredToolkitData, unwrapBackup, validateToolkitData, buildDailyReport, createBackupEnvelope, upsertToolkitItem, mergeNetworkInventory } from "./toolkit-data.js";
 
 const STORAGE_KEY = "networkToolkitData";
 const esc = value => String(value ?? "").replace(/[&<>''"\"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
@@ -121,7 +121,7 @@ $("case-table-body").addEventListener("click", event => {
   if (button.dataset.caseAction === "delete") {
     if (!confirm(`ยืนยันลบเคส ${record.caseNumber}?`)) return;
     const index = store.records.indexOf(record); store.records.splice(index, 1);
-    if (!saveStore()) { store.records.splice(index, 0, record); feedback($("archive-feedback"), "ลบเคสไม่สำเร็จ ข้อมูลเดิมยังคงอยู่", true); return; }
+    if (!saveStore()) { store.records.splice(index, 0, record); feedback($("case-form-feedback"), "ลบเคสไม่สำเร็จ ข้อมูลเดิมยังคงอยู่", true); return; }
     renderCases(); return;
   }
   if (button.dataset.caseAction === "report") { copyReport(record); return; }
@@ -133,7 +133,7 @@ $("case-table-body").addEventListener("click", event => {
 });
 ["case-search", "case-filter-type", "case-filter-status", "case-filter-date"].forEach(id => $(id).addEventListener(id === "case-search" ? "input" : "change", renderCases));
 function caseReport(record) { return [`รายงานเคส ${record.caseNumber || "-"}`, `อาการ: ${record.symptomDetail || "-"}`, `สถานะ: ${record.status || "-"}`, `สาขา: ${record.branch || "-"}`, `แผนก: ${record.department || "-"}`, `อุปกรณ์: ${record.computerName || "-"} (${record.ipAddress || "-"})`, `การตรวจสอบ: ${record.investigation || "-"}`, `สาเหตุที่ยืนยัน: ${record.confirmedCause || "-"}`, `วิธีแก้ไข: ${record.resolution || "-"}`, `ผลทดสอบ: ${record.postTest || "-"}`, `หมายเหตุ: ${record.notes || "-"}`].join("\n"); }
-async function copyReport(record) { try { await navigator.clipboard.writeText(caseReport(record)); feedback($("archive-feedback"), "คัดลอกรายงานเคสแล้ว"); } catch { feedback($("archive-feedback"), "คัดลอกไม่สำเร็จ กรุณาเลือกข้อความด้วยตนเอง", true); } }
+async function copyReport(record) { try { await navigator.clipboard.writeText(caseReport(record)); feedback($("case-form-feedback"), "คัดลอกรายงานเคสแล้ว"); } catch { feedback($("case-form-feedback"), "คัดลอกไม่สำเร็จ กรุณาเลือกข้อความด้วยตนเอง", true); } }
 
 const inventoryForm = $("inventory-form");
 function renderInventory() {
@@ -242,5 +242,46 @@ $("backup-table-body").addEventListener("click", event => { const button = event
 $("export-backup-button").addEventListener("click", () => { const entry = backupEntries().find(item => item.key === selectedBackupKey) || backupEntries()[0]; if (!entry) return; const blob = new Blob([JSON.stringify(createBackupEnvelope(entry.data), null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = "network-toolkit-backup.json"; link.click(); URL.revokeObjectURL(url); feedback($("backup-feedback"), "ส่งออก Backup เรียบร้อย"); });
 $("import-backup-button").addEventListener("click", () => $("import-backup-file").click());
 $("import-backup-file").addEventListener("change", async event => { const file = event.target.files[0]; if (!file) return; try { const data = unwrapBackup(JSON.parse(await file.text())); if (!validateToolkitData(data)) throw new Error("invalid structure"); if (!confirm(`พบ ${backupSummary(data)} ต้องการกู้คืนข้อมูลหรือไม่?`)) return; restoreBackup(JSON.stringify(createBackupEnvelope(data)), file.name); } catch { feedback($("backup-feedback"), "ไฟล์ JSON ไม่ถูกต้องหรือโครงสร้างไม่รองรับ ข้อมูลปัจจุบันยังไม่ถูกเปลี่ยน", true); } });
+
+window.addEventListener("toolkit:create-case", event => {
+  const source = event.detail || {};
+  if (!source || typeof source !== "object") return;
+  const existing = store.records.find(record => String(record.id) === String(source.id));
+  const candidate = {
+    ...source,
+    id: source.id || (crypto.randomUUID?.() || `case-${Date.now()}`),
+    caseNumber: existing?.caseNumber || source.caseNumber || nextCaseNumber(),
+    status: existing?.status || source.status || "Open",
+    type: source.type || "Network",
+    createdAt: existing?.createdAt || source.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  const result = upsertToolkitItem(store.records, candidate, candidate.id);
+  if (!result.ok) return;
+  const previousRecords = store.records;
+  store.records = result.items;
+  if (!saveStore()) {
+    store.records = previousRecords;
+    feedback($("case-form-feedback"), "เพิ่มผลตรวจเข้ารายการเคสไม่สำเร็จ พื้นที่จัดเก็บอาจเต็มแล้ว", true);
+    return;
+  }
+  renderCases();
+  feedback($("case-form-feedback"), `${result.updated ? "อัปเดต" : "เพิ่ม"}ผลตรวจในเคส ${candidate.caseNumber} เรียบร้อยแล้ว`);
+});
+
+window.addEventListener("toolkit:add-inventory", event => {
+  const source = event.detail || {};
+  if (!source.computerName?.trim() && !source.ipAddress?.trim()) return;
+  const previousInventory = store.inventory;
+  const result = mergeNetworkInventory(store.inventory, source, "", () => crypto.randomUUID?.() || `pc-${Date.now()}`);
+  store.inventory = result.items;
+  if (!saveStore()) {
+    store.inventory = previousInventory;
+    feedback($("inventory-feedback"), "เพิ่มข้อมูลใน PC Inventory ไม่สำเร็จ พื้นที่จัดเก็บอาจเต็มแล้ว", true);
+    return;
+  }
+  renderInventory();
+  feedback($("inventory-feedback"), result.updated ? "อัปเดตข้อมูลเดิมใน PC Inventory แล้ว" : "เพิ่มเครื่องลง PC Inventory แล้ว");
+});
 
 renderCases(); renderInventory(); renderPrinter(); renderBackups();

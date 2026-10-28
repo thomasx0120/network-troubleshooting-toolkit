@@ -6,7 +6,7 @@ const test = require('node:test');
 const source = fs.readFileSync('js/toolkit-data.js', 'utf8').replace(/^export /gm, '');
 const context = { console, Blob: global.Blob, JSON };
 vm.createContext(context);
-vm.runInContext(`${source}\nthis.api={isPlainObject,parseStoredToolkitData,validateToolkitData,unwrapBackup,mergeToolkitCollections,findDuplicateInventory,safeStorageWrite,restoreWithRollback,findDuplicateCase,upsertToolkitItem,removeToolkitItem,filterToolkitCases,createBackupEnvelope,previewBackupText,buildDailyReport};`, context);
+vm.runInContext(`${source}\nthis.api={isPlainObject,parseStoredToolkitData,validateToolkitData,unwrapBackup,mergeToolkitCollections,findDuplicateInventory,safeStorageWrite,restoreWithRollback,findDuplicateCase,upsertToolkitItem,mergeNetworkInventory,upsertTroubleshootingCase,removeToolkitItem,filterToolkitCases,createBackupEnvelope,previewBackupText,buildDailyReport};`, context);
 const api = context.api;
 
 function storage(initial = {}) {
@@ -50,6 +50,27 @@ test('merge preserves old and new collections and unknown fields', () => {
   assert.equal(merged.inventory[0].ipAddress, '10.0.0.1');
   assert.equal(merged.legacy, 1);
   assert.equal(merged.custom, 2);
+});
+
+test('network troubleshooting case can be created and updated without duplicates', () => {
+  const source = { id: 'guide-1', caseNumber: '', symptomDetail: 'เชื่อมต่อไม่ได้ — พบหลายเครื่อง', investigation: 'ตรวจ Gateway: พบปัญหา', resolution: 'ตรวจสายและ Wi-Fi', troubleshooting: { stages: { gateway: 'issue' } } };
+  const created = api.upsertTroubleshootingCase([], source);
+  assert.equal(created.items.length, 1);
+  const updated = api.upsertTroubleshootingCase(created.items, { ...source, investigation: 'ตรวจ Gateway: พบปัญหา\nตรวจ DNS: ผ่าน' });
+  assert.equal(updated.items.length, 1);
+  assert.equal(updated.updated, true);
+  assert.match(updated.item.investigation, /DNS/);
+});
+
+test('network information maps fields into inventory and updates duplicate safely', () => {
+  const created = api.mergeNetworkInventory([], { computerName: 'TEST-PC', ipAddress: '10.0.0.10', gateway: '10.0.0.1', dnsServer: '8.8.8.8' }, '', () => 'pc-1');
+  assert.equal(created.items[0].computerName, 'TEST-PC');
+  assert.equal(created.items[0].gateway, '10.0.0.1');
+  const updated = api.mergeNetworkInventory(created.items, { computerName: 'test-pc', ipAddress: '10.0.0.11', subnetMask: '255.255.255.0' });
+  assert.equal(updated.items.length, 1);
+  assert.equal(updated.updated, true);
+  assert.equal(updated.item.gateway, '10.0.0.1');
+  assert.equal(updated.item.subnetMask, '255.255.255.0');
 });
 
 test('inventory duplicate handles missing computerName and supports IP/name duplicate', () => {

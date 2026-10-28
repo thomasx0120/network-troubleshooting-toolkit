@@ -8,7 +8,7 @@ const guideStages = [
   { id: "internet", label: "ทดสอบการเชื่อมต่ออินเทอร์เน็ต" },
   { id: "dns", label: "ตรวจการทำงานของ DNS" }
 ];
-const checklistKeys = ["cable", "ipconfig", "gateway", "public-ip", "dns", "other-devices"];
+const checklistKeys = ["cable", "ipconfig", "gateway", "public-ip", "dns"];
 
 function showFeedback(element, message, isError = false) {
   element.textContent = message;
@@ -202,6 +202,16 @@ document.querySelector("#copy-info").addEventListener("click", () => {
     .join("\n");
 
   copyText(formattedText, infoFeedback, "คัดลอกข้อมูลเครือข่ายเรียบร้อยแล้ว");
+});
+
+document.querySelector("#add-network-to-inventory").addEventListener("click", () => {
+  const data = Object.fromEntries(new FormData(networkForm).entries());
+  if (!data.computerName?.trim() && !data.ipAddress?.trim()) {
+    showFeedback(infoFeedback, "กรุณากรอกชื่อคอมพิวเตอร์หรือ IP Address ก่อนเพิ่มลง PC Inventory", true);
+    return;
+  }
+  window.dispatchEvent(new CustomEvent("toolkit:add-inventory", { detail: data }));
+  showFeedback(infoFeedback, "ส่งข้อมูลไปยัง PC Inventory แล้ว ตรวจชื่อหรือ IP ซ้ำในรายการทะเบียน", false);
 });
 
 const checklistItems = Array.from(document.querySelectorAll(".checklist-item input"));
@@ -455,6 +465,7 @@ guidedForm.addEventListener("change", () => {
 });
 guidedForm.addEventListener("reset", () => {
   window.setTimeout(() => {
+    troubleshootingDraftId = "";
     updateGuidance();
     persistCurrentData();
     showFeedback(guideFeedback, "เริ่มบันทึกปัญหาใหม่เรียบร้อยแล้ว");
@@ -484,264 +495,54 @@ document.querySelector("#copy-guide-report").addEventListener("click", () => {
   copyText(lines.join("\n"), guideFeedback, "คัดลอกรายงานตรวจสอบเรียบร้อยแล้ว");
 });
 
-const savedCaseList = document.querySelector("#saved-case-list");
-const savedCaseCount = document.querySelector("#saved-case-count");
-const emptySavedCases = document.querySelector("#empty-saved-cases");
-const archiveFeedback = document.querySelector("#archive-feedback");
-const importCasesFile = document.querySelector("#import-cases-file");
-
-function saveArchive() {
-  if (storageReadError) {
-    savedState.textContent = "พบข้อมูลเดิมที่อ่านไม่ได้—ยังไม่เขียนทับข้อมูลต้นฉบับ";
-    return false;
-  }
-  const didSave = saveData(savedData);
-  savedState.textContent = didSave ? "บันทึกในเครื่องนี้" : "บันทึกไม่สำเร็จ";
-  return didSave;
-}
-
-function formatDate(dateValue) {
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) return "ไม่ทราบวันที่";
-  return new Intl.DateTimeFormat("th-TH", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  }).format(date);
-}
-
-function getSymptomLabel(value) {
-  const option = guidedForm.querySelector(`[name="symptom"] option[value="${CSS.escape(value)}"]`);
-  return option ? option.textContent : "ไม่ระบุอาการ";
-}
-
-function renderSavedCases() {
-  const records = savedData.records.slice().sort((first, second) => (
-    new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime()
-  ));
-
-  savedCaseList.replaceChildren();
-  savedCaseCount.textContent = `มีเคสที่บันทึก ${records.length} รายการ`;
-  emptySavedCases.hidden = records.length > 0;
-  document.querySelector("#export-cases").disabled = records.length === 0;
-
-  records.forEach((record) => {
-    const card = document.createElement("article");
-    card.className = "saved-case";
-
-    const details = document.createElement("div");
-    details.className = "saved-case-details";
-
-    const heading = document.createElement("h3");
-    heading.textContent = record.title || getSymptomLabel(record.symptom);
-
-    const meta = document.createElement("p");
-    meta.className = "saved-case-meta";
-    meta.textContent = `${getSymptomLabel(record.symptom)} · บันทึก ${formatDate(record.createdAt)}`;
-
-    const progress = document.createElement("p");
-    progress.className = "saved-case-progress";
-    const completed = Object.values(record.stages || {}).filter((value) => value !== "todo").length;
-    const device = [record.network.computerName, record.network.ipAddress].filter(Boolean).join(" · ");
-    progress.textContent = `บันทึกผลแล้ว ${completed} จาก ${guideStages.length} ขั้น${device ? ` · ${device}` : ""}`;
-
-    const actions = document.createElement("div");
-    actions.className = "saved-case-actions";
-
-    const exportButton = document.createElement("button");
-    exportButton.className = "button button-secondary";
-    exportButton.type = "button";
-    exportButton.dataset.caseAction = "export";
-    exportButton.dataset.caseId = record.id;
-    exportButton.textContent = "ดาวน์โหลด";
-    exportButton.setAttribute("aria-label", `ดาวน์โหลดเคส ${heading.textContent}`);
-
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "button button-danger";
-    deleteButton.type = "button";
-    deleteButton.dataset.caseAction = "delete";
-    deleteButton.dataset.caseId = record.id;
-    deleteButton.textContent = "ลบ";
-    deleteButton.setAttribute("aria-label", `ลบเคส ${heading.textContent}`);
-
-    details.append(heading, meta, progress);
-    actions.append(exportButton, deleteButton);
-    card.append(details, actions);
-    savedCaseList.append(card);
-  });
-}
-
-function makeArchive(records) {
-  return {
-    format: "network-troubleshooting-toolkit",
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    records
-  };
-}
-
-function downloadJsonFile(data, fileName) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
-  const downloadUrl = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = downloadUrl;
-  link.download = fileName;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
-}
-
-function createCaseRecord() {
+let troubleshootingDraftId = "";
+function createTroubleshootingCase() {
   const network = Object.fromEntries(new FormData(networkForm).entries());
   const stages = Object.fromEntries(guideSelects.map((select) => [select.dataset.stage, select.value]));
   const stageNotes = Object.fromEntries(guideNotes.map((input) => [input.dataset.stageNote, input.value.trim()]));
-  const checklist = Object.fromEntries(checklistItems.map((checkbox) => [checkbox.dataset.check, checkbox.checked]));
-  const quickNotes = notesField.value.trim();
-  const hasNetworkInfo = Object.values(network).some((value) => String(value).trim() !== "");
-  const hasGuideResults = Object.values(stages).some((value) => value !== "todo");
-  const hasStageNotes = Object.values(stageNotes).some(Boolean);
   const title = guidedForm.elements.caseTitle.value.trim();
+  const symptomLabel = guidedForm.elements.symptom.selectedOptions[0].textContent;
+  const symptomDetail = [symptomLabel, stageNotes.devices].filter(Boolean).join(" — ");
+  const advice = getGuideRecommendation();
+  const investigation = guideStages.map((stage) => {
+    const status = stages[stage.id] === "todo" ? "ยังไม่ได้ตรวจ" : (stages[stage.id] === "pass" ? "ผ่าน" : "พบปัญหา");
+    return `${stage.label}: ${status}${stageNotes[stage.id] ? ` — ${stageNotes[stage.id]}` : ""}`;
+  }).join("\n");
 
-  if (!title && !hasNetworkInfo && !hasGuideResults && !hasStageNotes && !quickNotes) {
-    showFeedback(guideFeedback, "กรุณากรอกหัวข้อ ข้อมูลเครื่อง ผลตรวจ หรือบันทึกอย่างน้อย 1 รายการก่อนบันทึกเคส", true);
-    guidedForm.elements.caseTitle.focus();
-    return null;
-  }
-
-  const recommendation = getGuideRecommendation();
   return {
-    id: typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `case-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    id: troubleshootingDraftId || (troubleshootingDraftId = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `case-${Date.now()}-${Math.random().toString(16).slice(2)}`),
     title,
     createdAt: new Date().toISOString(),
-    symptom: guidedForm.elements.symptom.value,
-    scope: guidedForm.elements.scope.value,
-    network,
-    stages,
-    stageNotes,
-    checklist,
-    quickNotes,
-    recommendation
+    caseNumber: "",
+    status: "Open",
+    type: "Network",
+    symptomDetail,
+    computerName: network.computerName || "",
+    ipAddress: network.ipAddress || "",
+    branch: "",
+    department: "",
+    reporter: "",
+    investigation,
+    suspectedCause: "",
+    confirmedCause: Object.entries(stageNotes).filter(([, note]) => note).map(([stage, note]) => `${guideStages.find(item => item.id === stage)?.label || stage}: ${note}`).join("\n"),
+    resolution: `${advice.step}\n${advice.body}`,
+    postTest: stages.internet === "pass" && stages.gateway === "pass" && stages.dns === "pass" ? "ผ่าน" : "รอตรวจเพิ่มเติม",
+    notes: notesField.value.trim(),
+    source: "network-troubleshooter",
+    troubleshooting: { symptom: guidedForm.elements.symptom.value, scope: guidedForm.elements.scope.value, network, stages, stageNotes }
   };
 }
 
 document.querySelector("#save-case").addEventListener("click", () => {
-  const record = createCaseRecord();
-  if (!record) return;
-
-  savedData.records.push(record);
-  if (!saveArchive()) {
-    savedData.records.pop();
-    showFeedback(guideFeedback, "เคสบันทึกไม่สำเร็จ พื้นที่จัดเก็บในเบราว์เซอร์อาจเต็มแล้ว", true);
+  const record = createTroubleshootingCase();
+  const hasContent = record.title || record.computerName || record.ipAddress || record.notes || Object.values(record.troubleshooting.stages).some((value) => value !== "todo") || Object.values(record.troubleshooting.stageNotes).some(Boolean);
+  if (!hasContent) {
+    showFeedback(guideFeedback, "กรุณากรอกหัวข้อ ข้อมูลเครื่อง ผลตรวจ หรือบันทึกอย่างน้อย 1 รายการก่อนเพิ่มผลเข้ารายการเคส", true);
+    guidedForm.elements.caseTitle.focus();
     return;
   }
-
-  renderSavedCases();
-  showFeedback(guideFeedback, "บันทึกเคสแยกไว้ในรายการเรียบร้อยแล้ว");
-});
-
-document.querySelector("#export-cases").addEventListener("click", () => {
-  const records = savedData.records || [];
-  if (records.length === 0) {
-    showFeedback(archiveFeedback, "ยังไม่มีเคสให้ส่งออก", true);
-    return;
-  }
-
-  downloadJsonFile(makeArchive(records), "network-troubleshooting-cases.json");
-  showFeedback(archiveFeedback, "ดาวน์โหลดไฟล์ข้อมูล JSON เรียบร้อยแล้ว ตรวจสอบข้อมูลก่อนส่งต่อ");
-});
-
-savedCaseList.addEventListener("click", (event) => {
-  const button = event.target.closest("button[data-case-action]");
-  if (!button) return;
-
-  const recordIndex = savedData.records.findIndex((record) => record.id === button.dataset.caseId);
-  if (recordIndex < 0) {
-    showFeedback(archiveFeedback, "ไม่พบเคสนี้ในรายการ กรุณารีเฟรชหน้าแล้วลองอีกครั้ง", true);
-    return;
-  }
-
-  if (button.dataset.caseAction === "export") {
-    const record = savedData.records[recordIndex];
-    downloadJsonFile(makeArchive([record]), `network-case-${Date.now()}.json`);
-    showFeedback(archiveFeedback, "ดาวน์โหลดเคสที่เลือกเรียบร้อยแล้ว");
-    return;
-  }
-
-  const [record] = savedData.records.splice(recordIndex, 1);
-  if (!saveArchive()) {
-    savedData.records.splice(recordIndex, 0, record);
-    showFeedback(archiveFeedback, "ลบเคสไม่สำเร็จ พื้นที่จัดเก็บในเบราว์เซอร์อาจมีปัญหา", true);
-    return;
-  }
-
-  renderSavedCases();
-  showFeedback(archiveFeedback, "ลบเคสที่เลือกเรียบร้อยแล้ว");
-});
-
-document.querySelector("#import-cases").addEventListener("click", () => {
-  importCasesFile.click();
-});
-
-function isValidCaseRecord(record) {
-  if (!record || typeof record !== "object" || Array.isArray(record)) return false;
-  if (typeof record.id !== "string" || !record.id || typeof record.createdAt !== "string") return false;
-  if (Number.isNaN(new Date(record.createdAt).getTime())) return false;
-  if (!["no-internet", "slow", "website", "dns", "local"].includes(record.symptom)) return false;
-  if (!["unknown", "one", "many"].includes(record.scope)) return false;
-  if (typeof record.title !== "string" || typeof record.quickNotes !== "string") return false;
-  if (!record.network || typeof record.network !== "object" || Array.isArray(record.network)) return false;
-  if (!record.stages || typeof record.stages !== "object" || Array.isArray(record.stages)) return false;
-  if (!record.stageNotes || typeof record.stageNotes !== "object" || Array.isArray(record.stageNotes)) return false;
-  if (!record.checklist || typeof record.checklist !== "object" || Array.isArray(record.checklist)) return false;
-
-  const networkFields = ["computerName", "ipAddress", "subnetMask", "gateway", "dnsServer", "notes"];
-  if (!networkFields.every((field) => typeof record.network[field] === "string")) return false;
-  if (!guideStages.every((stage) => ["todo", "pass", "issue"].includes(record.stages[stage.id]))) return false;
-  if (!guideStages.every((stage) => typeof record.stageNotes[stage.id] === "string")) return false;
-  return checklistKeys.every((key) => typeof record.checklist[key] === "boolean");
-}
-
-importCasesFile.addEventListener("change", async () => {
-  const file = importCasesFile.files[0];
-  if (!file) return;
-
-  try {
-    const imported = JSON.parse(await file.text());
-    if (imported.format !== "network-troubleshooting-toolkit" || imported.version !== 1 || !Array.isArray(imported.records)) {
-      showFeedback(archiveFeedback, "ไฟล์นี้ไม่ใช่ไฟล์สำรองของ Toolkit หรือไม่รองรับเวอร์ชันนี้", true);
-      return;
-    }
-
-    if (!imported.records.every(isValidCaseRecord)) {
-      showFeedback(archiveFeedback, "ไฟล์มีข้อมูลเคสไม่ครบหรือรูปแบบไม่ถูกต้อง จึงยังไม่ได้นำเข้า", true);
-      return;
-    }
-
-    const existingIds = new Set(savedData.records.map((record) => record.id));
-    const newRecords = imported.records.filter((record) => {
-      if (existingIds.has(record.id)) return false;
-      existingIds.add(record.id);
-      return true;
-    });
-    if (newRecords.length === 0) {
-      showFeedback(archiveFeedback, "เคสจากไฟล์นี้มีอยู่ในรายการแล้ว");
-      return;
-    }
-
-    savedData.records.push(...newRecords);
-    if (!saveArchive()) {
-      savedData.records.splice(-newRecords.length, newRecords.length);
-      showFeedback(archiveFeedback, "นำเข้าไม่สำเร็จ พื้นที่จัดเก็บในเบราว์เซอร์อาจเต็มแล้ว", true);
-      return;
-    }
-
-    renderSavedCases();
-    showFeedback(archiveFeedback, `นำเข้าเคสใหม่ ${newRecords.length} รายการเรียบร้อยแล้ว`);
-  } catch (error) {
-    showFeedback(archiveFeedback, "อ่านไฟล์ไม่สำเร็จ กรุณาเลือกไฟล์ JSON ที่ส่งออกจาก Toolkit", true);
-  } finally {
-    importCasesFile.value = "";
-  }
+  window.dispatchEvent(new CustomEvent("toolkit:create-case", { detail: record }));
+  showFeedback(guideFeedback, "ส่งผลตรวจไปยัง Case Management แล้ว กรุณาตรวจและบันทึกสถานะในรายการเคส", false);
 });
 
 function restoreGuidedSession() {
@@ -766,4 +567,3 @@ restoreGuidedSession();
 const savedGateway = gatewayField.value.trim();
 if (savedGateway) guideGatewayCommand.textContent = `ping ${savedGateway}`;
 updateGuidance();
-renderSavedCases();
