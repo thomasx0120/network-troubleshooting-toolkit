@@ -59,7 +59,6 @@ if (!Array.isArray(savedData.records)) {
   savedData.records = [];
 }
 const savedState = document.querySelector("#saved-state");
-const notesSaveStatus = document.querySelector("#notes-save-status");
 const guidedForm = document.querySelector("#guided-form");
 const guideSelects = Array.from(guidedForm.querySelectorAll("[data-stage]"));
 const guideNotes = Array.from(guidedForm.querySelectorAll("[data-stage-note]"));
@@ -72,7 +71,6 @@ const guideFeedback = document.querySelector("#guide-feedback");
 
 if (storageReadError) {
   savedState.textContent = "ไม่สามารถอ่านข้อมูลเดิมได้";
-  notesSaveStatus.textContent = "เบราว์เซอร์ปิดการใช้งานพื้นที่จัดเก็บ";
 }
 
 function persistCurrentData() {
@@ -83,8 +81,6 @@ function persistCurrentData() {
     if (Array.isArray(latestStoredData.records)) latestRecords = latestStoredData.records;
     if (Array.isArray(latestStoredData.inventory)) latestInventory = latestStoredData.inventory;
   } catch {}
-  const formData = Object.fromEntries(new FormData(networkForm).entries());
-  const checklist = Object.fromEntries(checklistItems.map((checkbox) => [checkbox.dataset.check, checkbox.checked]));
   const guideFormData = Object.fromEntries(new FormData(guidedForm).entries());
   const stages = Object.fromEntries(guideSelects.map((select) => [select.dataset.stage, select.value]));
   const stageNotes = Object.fromEntries(guideNotes.map((input) => [input.dataset.stageNote, input.value]));
@@ -92,16 +88,12 @@ function persistCurrentData() {
     ...savedData,
     records: latestRecords,
     inventory: latestInventory,
-    form: formData,
-    checklist,
-    quickNotes: notesField.value,
     guidedSession: { ...guideFormData, stages, stageNotes }
   };
 
   const didSave = !storageReadError && saveData(savedData);
   if (storageReadError) savedState.textContent = "พบข้อมูลเดิมที่อ่านไม่ได้—ข้อมูลสำรองถูกเก็บไว้";
   else savedState.textContent = didSave ? "บันทึกในเครื่องนี้" : "บันทึกไม่สำเร็จ";
-  notesSaveStatus.textContent = storageReadError ? "ข้อมูลเดิมถูกสำรองไว้ ยังไม่เขียนทับ" : (didSave ? "บันทึกอัตโนมัติในเครื่องนี้" : "บันทึกไม่สำเร็จ กรุณาตรวจสอบพื้นที่จัดเก็บ");
 }
 
 async function copyText(text, feedbackElement, successMessage) {
@@ -161,128 +153,12 @@ document.querySelectorAll(".copy-button").forEach((button) => {
   });
 });
 
-const networkForm = document.querySelector("#network-info-form");
-const infoFeedback = document.querySelector("#info-feedback");
-const gatewayField = networkForm.elements.gateway;
-const gatewayCommand = document.querySelector("#gateway-command");
-const gatewayCopyButton = gatewayCommand.closest(".command-card").querySelector(".copy-button");
-const guideGatewayCommand = document.querySelector("#guide-gateway-command");
-
-gatewayField.addEventListener("input", () => {
-  const gateway = gatewayField.value.trim() || "192.168.1.1";
-  const command = `ping ${gateway}`;
-  gatewayCommand.textContent = command;
-  gatewayCopyButton.dataset.copy = command;
-  guideGatewayCommand.textContent = command;
-  persistCurrentData();
-});
-
-networkForm.addEventListener("input", persistCurrentData);
-networkForm.addEventListener("reset", () => {
-  window.setTimeout(() => {
-    showFeedback(infoFeedback, "ล้างข้อมูลในแบบฟอร์มเรียบร้อยแล้ว");
-    persistCurrentData();
-    gatewayCommand.textContent = "ping 192.168.1.1";
-    gatewayCopyButton.dataset.copy = "ping 192.168.1.1";
-  });
-});
-
-document.querySelector("#copy-info").addEventListener("click", () => {
-  const formData = new FormData(networkForm);
-  const fields = [
-    ["ชื่อคอมพิวเตอร์", "computerName"],
-    ["IP Address", "ipAddress"],
-    ["Subnet Mask", "subnetMask"],
-    ["Default Gateway", "gateway"],
-    ["DNS Server", "dnsServer"],
-    ["บันทึกเพิ่มเติม", "notes"]
-  ];
-  const formattedText = fields
-    .map(([label, name]) => `${label}: ${String(formData.get(name) || "").trim() || "-"}`)
-    .join("\n");
-
-  copyText(formattedText, infoFeedback, "คัดลอกข้อมูลเครือข่ายเรียบร้อยแล้ว");
-});
-
-document.querySelector("#add-network-to-inventory").addEventListener("click", () => {
-  const data = Object.fromEntries(new FormData(networkForm).entries());
-  if (!data.computerName?.trim() && !data.ipAddress?.trim()) {
-    showFeedback(infoFeedback, "กรุณากรอกชื่อคอมพิวเตอร์หรือ IP Address ก่อนเพิ่มลง PC Inventory", true);
-    return;
-  }
-  window.dispatchEvent(new CustomEvent("toolkit:add-inventory", { detail: data }));
-  showFeedback(infoFeedback, "ส่งข้อมูลไปยัง PC Inventory แล้ว ตรวจชื่อหรือ IP ซ้ำในรายการทะเบียน", false);
-});
-
-const checklistItems = Array.from(document.querySelectorAll(".checklist-item input"));
-const progressTrack = document.querySelector("#progress-track");
-const progressFill = document.querySelector("#progress-fill");
-const progressCount = document.querySelector("#progress-count");
-const overviewProgress = document.querySelector("#overview-progress");
-
-function updateProgress() {
-  const completed = checklistItems.filter((checkbox) => checkbox.checked).length;
-  const total = checklistItems.length;
-  const percentage = total === 0 ? 0 : (completed / total) * 100;
-
-  progressFill.style.width = `${percentage}%`;
-  progressTrack.setAttribute("aria-valuenow", String(completed));
-  progressCount.textContent = `เสร็จแล้ว ${completed} จาก ${total} ข้อ`;
-  overviewProgress.innerHTML = `${completed} <span>จาก ${total} ขั้นตอน</span>`;
-}
-
-checklistItems.forEach((checkbox) => {
-  checkbox.addEventListener("change", () => {
-    updateProgress();
-    persistCurrentData();
-  });
-});
-
-document.querySelector("#reset-checklist").addEventListener("click", () => {
-  checklistItems.forEach((checkbox) => {
-    checkbox.checked = false;
-  });
-  updateProgress();
-  persistCurrentData();
-});
-
-const notesField = document.querySelector("#quick-notes");
-const notesFeedback = document.querySelector("#notes-feedback");
-notesField.addEventListener("input", persistCurrentData);
-document.querySelector("#copy-notes").addEventListener("click", () => {
-  const notes = notesField.value.trim();
-  if (!notes) {
-    showFeedback(notesFeedback, "กรุณาเขียนบันทึกก่อนคัดลอก", true);
-    notesField.focus();
-    return;
-  }
-
-  copyText(notes, notesFeedback, "คัดลอกบันทึกเรียบร้อยแล้ว");
-});
-
 function restoreSavedData() {
-  const formValues = savedData.form || {};
-  Object.entries(formValues).forEach(([name, value]) => {
-    const field = networkForm.elements.namedItem(name);
-    if (field) field.value = value;
-  });
-
-  const savedChecklist = savedData.checklist || {};
-  checklistItems.forEach((checkbox) => {
-    checkbox.checked = Boolean(savedChecklist[checkbox.dataset.check]);
-  });
-
-  notesField.value = savedData.quickNotes || "";
-  const gateway = gatewayField.value.trim();
-  if (gateway) {
-    const command = `ping ${gateway}`;
-    gatewayCommand.textContent = command;
-    gatewayCopyButton.dataset.copy = command;
-  }
+  // Preserve legacy localStorage fields without recreating removed UI controls.
+  void savedData;
 }
 
 restoreSavedData();
-updateProgress();
 
 // จัดการลิงก์ค้นหาจากแถบที่อยู่โดยไม่ต้องโหลดหน้าใหม่
 function openRequestedSection() {
@@ -497,7 +373,7 @@ document.querySelector("#copy-guide-report").addEventListener("click", () => {
 
 let troubleshootingDraftId = "";
 function createTroubleshootingCase() {
-  const network = Object.fromEntries(new FormData(networkForm).entries());
+  const network = {};
   const stages = Object.fromEntries(guideSelects.map((select) => [select.dataset.stage, select.value]));
   const stageNotes = Object.fromEntries(guideNotes.map((input) => [input.dataset.stageNote, input.value.trim()]));
   const title = guidedForm.elements.caseTitle.value.trim();
@@ -527,7 +403,7 @@ function createTroubleshootingCase() {
     confirmedCause: Object.entries(stageNotes).filter(([, note]) => note).map(([stage, note]) => `${guideStages.find(item => item.id === stage)?.label || stage}: ${note}`).join("\n"),
     resolution: `${advice.step}\n${advice.body}`,
     postTest: stages.internet === "pass" && stages.gateway === "pass" && stages.dns === "pass" ? "ผ่าน" : "รอตรวจเพิ่มเติม",
-    notes: notesField.value.trim(),
+    notes: "",
     source: "network-troubleshooter",
     troubleshooting: { symptom: guidedForm.elements.symptom.value, scope: guidedForm.elements.scope.value, network, stages, stageNotes }
   };
@@ -564,6 +440,4 @@ function restoreGuidedSession() {
 }
 
 restoreGuidedSession();
-const savedGateway = gatewayField.value.trim();
-if (savedGateway) guideGatewayCommand.textContent = `ping ${savedGateway}`;
 updateGuidance();

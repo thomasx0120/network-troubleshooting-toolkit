@@ -64,7 +64,10 @@ class ToolkitStaticTests(unittest.TestCase):
         self.assertNotIn('id="saved-cases"', self.html)
         self.assertIn('เพิ่มผลตรวจเข้ารายการเคส', self.html)
         self.assertIn('id="daily-report-open">ไปยังรายงานประจำวัน', self.html)
-        self.assertIn('id="add-network-to-inventory"', self.html)
+        self.assertNotIn('id="network-info-form"', self.html)
+        self.assertNotIn('id="device-info"', self.html)
+        self.assertNotIn('id="checklist"', self.html)
+        self.assertNotIn('id="notes-section"', self.html)
         self.assertIn('toolkit:create-case', self.personal)
         self.assertIn('toolkit:add-inventory', self.personal)
         self.assertIn('symptomDetail', (ROOT / 'script.js').read_text(encoding='utf-8'))
@@ -77,7 +80,7 @@ class ToolkitStaticTests(unittest.TestCase):
         self.assertIn('js/index-auth.js?v=', html)
         self.assertIn('script.js?v=', auth)
         self.assertIn('personal-support.js?v=', auth)
-        self.assertIn('../script.js?v=4', auth)
+        self.assertIn('../script.js?v=5', auth)
         self.assertIn('./personal-support.js?v=3', auth)
 
     def test_no_service_role_or_secret_keys(self):
